@@ -5591,13 +5591,13 @@ window.debugLegendState = function() {
   };
 };
 
-// Function to purge unused legend items
-window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
+// Function to purge unused carrier items
+window.purgeUnusedCarrierItems = function purgeUnusedCarrierItems() {
   // console.log('=== PURGING UNUSED LEGEND ITEMS ===');
   
   const legendData = window.legend || window.carriers;
   if (!legendData || !Array.isArray(legendData)) {
-    alert('No legend data found');
+    alert('No carrier data found');
     return;
   }
   
@@ -5606,19 +5606,21 @@ window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
     return;
   }
   
-  // Get all legend types currently used by links
+  // Get all carrier types currently used by links (check both property names)
   const usedLegendTypes = new Set();
   window.links.forEach(link => {
-    if (link.legend) {
-      usedLegendTypes.add(link.legend);
+    const carrierType = link.carrier || link.legend;
+    if (carrierType) {
+      usedLegendTypes.add(carrierType);
     }
   });
   
   // Also check sankeyDataObject links if available
   if (window.sankeyDataObject && window.sankeyDataObject.links) {
     window.sankeyDataObject.links.forEach(link => {
-      if (link.legend) {
-        usedLegendTypes.add(link.legend);
+      const carrierType = link.carrier || link.legend;
+      if (carrierType) {
+        usedLegendTypes.add(carrierType);
       }
     });
   }
@@ -5634,13 +5636,13 @@ window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
   // console.log('Unused legend items found:', unusedItems);
   
   if (unusedItems.length === 0) {
-    alert('No unused legend items found. All legend items are currently in use.');
+    alert('No unused carrier items found. All carrier items are currently in use.');
     return;
   }
   
   // Show confirmation dialog
   const unusedNames = unusedItems.map(item => item.id).join(', ');
-  const confirmMessage = `Found ${unusedItems.length} unused legend item(s):\n\n${unusedNames}\n\nDo you want to remove these unused items?`;
+  const confirmMessage = `Found ${unusedItems.length} unused carrier item(s):\n\n${unusedNames}\n\nDo you want to remove these unused items?`;
   
   if (!confirm(confirmMessage)) {
     // console.log('Purge cancelled by user');
@@ -5656,12 +5658,18 @@ window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
   if (window.legend) window.legend = usedItems;
   if (window.carriers) window.carriers = usedItems;
   
-  // Also update currentSankeyConfig.legend if it exists
+  // Also update currentSankeyConfig.legend and carriers if they exist
   if (window.currentSankeyConfig && window.currentSankeyConfig.legend) {
     window.currentSankeyConfig.legend = window.currentSankeyConfig.legend.filter(legendItem =>
       usedLegendTypes.has(legendItem.id)
     );
     // console.log('Updated currentSankeyConfig.legend');
+  }
+  if (window.currentSankeyConfig && window.currentSankeyConfig.carriers) {
+    window.currentSankeyConfig.carriers = window.currentSankeyConfig.carriers.filter(carrierItem =>
+      usedLegendTypes.has(carrierItem.id)
+    );
+    // console.log('Updated currentSankeyConfig.carriers');
   }
   
   // console.log('Total legend items after purge:', window.legend.length);
@@ -5674,7 +5682,7 @@ window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
   }, 100);
   
   // Show success message
-  const successMessage = `Successfully removed ${unusedItems.length} unused legend item(s):\n${unusedNames}\n\nNote: These changes will be reflected in future Excel exports.`;
+  const successMessage = `Successfully removed ${unusedItems.length} unused carrier item(s):\n${unusedNames}\n\nNote: These changes will be reflected in future Excel exports.`;
   alert(successMessage);
   
   // console.log('Purge completed. Legend items have been removed from:');
