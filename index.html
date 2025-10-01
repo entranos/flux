@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Sankeyfy</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link
+    href="//fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet" type="text/css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/milligram.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- <link rel="icon" type="image/png" href="images/favicon.png"> -->
+
+</head>
+
+<script>
+  // dataSource = 'file';
+  let dataSource = 'url'
+
+  let projectID = 'ESA'
+  let productID = 'A'
+  let versionID = 'v5'
+
+  window.disableMouseEvents = true;
+  // Re-enable mouse events after a delay
+  setTimeout(() => {
+    window.disableMouseEvents = false;
+    console.log('Mouse events re-enabled after page load');
+  }, 1000);
+
+  // let sankeyData = { links: [], nodes: [], order: [] }
+</script>
+
+<body>
+  <div id="liner"></div>
+  <div id="loadFileDialog"></div>
+  <div id="showValueOnHover"></div>
+  <script>
+    // Conditionally show welcome screen based on data source
+    if (dataSource === 'file') {
+      // Show modern login screen for encrypted file access
+      // <div class="version-badge">v${versionID} • ${projectID}_${productID}</div>
+      document.getElementById('loadFileDialog').innerHTML = `
+        <div class="welcome-container">
+          <div class="welcome-card">
+            <div class="welcome-header">
+            
+              <h1 class="welcome-title" style="font-size: 40px!important;">Scenarioviewer</h1>
+               <h1 class="welcome-title" style="font-size: 17px!important;">PBL</h1>
+              <p class="welcome-subtitle"></p>
+              <div class="version-badge">AT • TVKN • WLO • II3050 • NPE</div>
+            </div>
+            <div class="welcome-content">
+              <div class="input-group">
+                <div class="input-wrapper" id="passphraseWrapper">
+                  <!-- Passphrase input will be inserted here -->
+                </div>
+              </div>
+              <div class="button-group" id="buttonGroup">
+                <!-- Decrypt button will be inserted here -->
+              </div>
+              <div class="status-message" id="statusMessage">
+                <!-- Status messages will appear here -->
+              </div>
+            </div>
+          </div>
+          <div class="welcome-footer">
+          </div>
+        </div>
+      `;
+    } else {
+      // For URL mode, hide the dialog and show minimal loading state
+      document.getElementById('loadFileDialog').innerHTML = `
+        <div style="display: none;">
+          <span style="font-weight:300;font-size:28px">Loading data...</span>
+          <br><br>
+          <span style="font-weight:400;font-size:12px">script: 
+            ${projectID}_${productID}_${versionID}</span>
+        </div>
+      `;
+    }
+  </script>
+  <div id="main-container">
+    <div class="content-fullwidth" style="padding:0px">
+      <div class="header-labels sticky-header">
+        <div class="header-content">
+          <div class="header-text">
+            <div class="concept-label label-base">
+              FLUX
+            </div>
+            <div class="middle-label label-base">
+              &nbsp; create bespoke sankey diagrams
+            </div>
+            <!-- <div class="version-label label-base">
+              attribution
+            </div> -->
+          </div>
+          <div class="header-buttons">
+            <button id="importExcelButton" class="edit-btn" onclick="importExcelFile()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <polyline points="16,13 8,13"></polyline>
+                <polyline points="16,17 8,17"></polyline>
+                <polyline points="10,9 9,9 8,9"></polyline>
+                <path d="M12 11v6M9 14l3-3 3 3"></path>
+              </svg>
+              Import XLSX
+            </button>
+
+            <button id="exportNodesButton" class="edit-btn" onclick="exportToExcel()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10,9 9,9 8,9"></polyline>
+              </svg>
+              Export XLSX
+            </button>
+
+            <button id="exportPngButton" class="edit-btn" onclick="exportSvgToPng()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7,10 12,15 17,10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export PNG
+            </button>
+
+            <button id="exportSvgButton" class="edit-btn" onclick="exportToSvg()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <path d="M8 13h2M8 17h2M16 13v4M16 11a2 2 0 0 0-2-2h-1"></path>
+              </svg>
+              Export SVG
+            </button>
+
+            <button id="manualButton" class="edit-btn" onclick="showManual()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              MANUAL
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class=" full-width-container">
+        <div class="content-constrained" id="control_panel" style="background-color: #EEF5FA;">
+
+          <!-- Tool Description -->
+          <div class="tool-description">
+            <p>FLUX lets you create Sankey diagrams with precision, flexibility and consistency in
+              unit-to-pixel scaling across sets of diagrams. Edit and import diagram
+              configuration data using spreadsheets, fine-tune layout and node positioning using FLUX, have it
+              render
+              results to PNG or SVG images and export all diagram configuration data back to XLSX for versioning,
+              collaboration and future edits.</p>
+          </div>
+
+          <div class="controls-grid">
+            <!-- Scaling Group -->
+            <div class="control-group-header collapsible-header collapsed" data-target="scaling-content"
+              onclick="toggleSection(this)">
+              <div class="header-left">
+                <button class="collapse-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+                <span>Scaling</span>
+              </div>
+              <button class="info-button"
+                data-tooltip="Unit-to-pixel scaling: Adjusts vertical spacing between nodes • Scale Canvas: Controls overall diagram zoom and viewport scaling for optimal viewing">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14.26V16"></path>
+                  <circle cx="12" cy="20" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="control-row-group collapsible-content collapsed" id="scaling-content">
+              <!-- <div class="control-row">
+                <label for="scaleDataValue" class="control-label">Scale Data Value:</label>
+                <input type="number" id="scaleDataValue" class="control-input number-input"
+                  placeholder="Enter scale value..." min="0.001" step="0.1"
+                  oninput="updateScaleDataValue(parseFloat(this.value))">
+              </div> -->
+              <div class="control-row">
+                <label for="scaleHeight" class="control-label">Unit-to-pixel scaling:</label>
+                <input type="number" id="scaleHeight" class="control-input number-input"
+                  placeholder="Enter unit-to-pixel scaling..." min="0.1" step="0.1"
+                  oninput="updateScaleHeight(parseFloat(this.value))">
+              </div>
+              <div class="control-row">
+                <label for="scaleCanvas" class="control-label">Canvas scaling:</label>
+                <input type="number" id="scaleCanvas" class="control-input number-input"
+                  placeholder="Enter canvas scale..." min="0.1" step="0.1"
+                  oninput="updateScaleCanvas(parseFloat(this.value))">
+              </div>
+            </div>
+
+            <!-- Canvas Size Group -->
+            <div class="control-group-header collapsible-header collapsed" data-target="canvas-content"
+              onclick="toggleSection(this)">
+              <div class="header-left">
+                <button class="collapse-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+                <span>Canvas Size</span>
+              </div>
+              <button class="info-button"
+                data-tooltip="Canvas Width: Sets the horizontal dimension of the drawing area in pixels • Canvas Height: Defines the vertical space available for the diagram • Affects export resolution and display size">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14.26V16"></path>
+                  <circle cx="12" cy="20" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="control-row-group collapsible-content collapsed" id="canvas-content">
+              <div class="control-row">
+                <label for="canvasWidth" class="control-label">Canvas Width:</label>
+                <input type="number" id="canvasWidth" class="control-input number-input"
+                  placeholder="Enter scroll width..." min="100" step="50"
+                  oninput="updatecanvasWidth(parseInt(this.value))">
+              </div>
+              <div class="control-row">
+                <label for="canvasHeight" class="control-label">Canvas Height:</label>
+                <input type="number" id="canvasHeight" class="control-input number-input"
+                  placeholder="Enter scroll height..." min="100" step="50"
+                  oninput="updatecanvasHeight(parseInt(this.value))">
+              </div>
+            </div>
+
+            <!-- Node Positioning Group -->
+            <div class="control-group-header collapsible-header collapsed" data-target="positioning-content"
+              onclick="toggleSection(this)">
+              <div class="header-left">
+                <button class="collapse-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+                <span>Nodes</span>
+              </div>
+              <button class="info-button"
+                data-tooltip="Show Value Labels: Toggles numeric flow values on nodes • Snap to Grid: Enables magnetic alignment for precise positioning • Grid Size: Sets spacing between grid points • Node Width: Controls the thickness of node rectangles • Node Color & Labels: Customize node appearance and text styling • Purge Unused Nodes: Remove nodes not connected to any flows">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14.26V16"></path>
+                  <circle cx="12" cy="20" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="control-row-group collapsible-content collapsed" id="positioning-content">
+              <div class="control-row">
+                <label class="control-label">Show Value Labels:</label>
+                <div class="toggle-controls">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="showValueLabelsToggle" checked onchange="updateShowValueLabels()">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="control-row">
+                <label class="control-label">Snap to Grid:</label>
+                <div class="snap-controls">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="snapToggle" checked onchange="updateSnapMode()">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="control-row">
+                <label for="snapSize" class="control-label">Grid Size (px):</label>
+                <input type="number" id="snapSize" class="control-input number-input" placeholder="Grid size..." min="1"
+                  step="1" value="20" oninput="updateSnapSize(parseInt(this.value))">
+              </div>
+              <div class="control-row">
+                <label for="nodeWidth" class="control-label">Node Width:</label>
+                <input type="number" id="nodeWidth" class="control-input number-input" placeholder="Node width..."
+                  min="1" step="1" value="15" oninput="updateNodeWidth(parseInt(this.value))">
+              </div>
+              <div class="control-row">
+                <label for="nodeColor" class="control-label">Node Color:</label>
+                <input type="color" id="nodeColor" class="control-input color-input"
+                  oninput="updateNodeColor(this.value)">
+              </div>
+              <div class="control-row">
+                <label for="labelTextColor" class="control-label">Label Text Color:</label>
+                <input type="color" id="labelTextColor" class="control-input color-input"
+                  oninput="updateLabelTextColor(this.value)">
+              </div>
+              <div class="control-row">
+                <label for="labelFillColor" class="control-label">Label Fill Color:</label>
+                <input type="color" id="labelFillColor" class="control-input color-input"
+                  oninput="updateLabelFillColor(this.value)">
+              </div>
+
+              <div class="control-row full-width-button">
+                <div class="button-container">
+                  <button id="bringNodesButton" class="edit-btn" onclick="bringNodesIntoView()" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"></path>
+                    </svg>
+                    Bring Nodes Into View
+                  </button>
+                  <button id="purgeUnusedNodesButton" class="edit-btn destructive" onclick="purgeUnusedNodes()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6">
+                      </path>
+                      <path d="M10 11v6M14 11v6"></path>
+                    </svg>
+                    Purge Unused Nodes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Title Group -->
+            <div class="control-group-header collapsible-header collapsed" data-target="title-content"
+              onclick="toggleSection(this)">
+              <div class="header-left">
+                <button class="collapse-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+                <span>Title</span>
+              </div>
+              <button class="info-button"
+                data-tooltip="Diagram Title Text: Main heading displayed above the diagram • Font Size: Controls title text size in pixels • X/Y Position: Precise pixel coordinates for title placement • Title Color: Customizes the title text color">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14.26V16"></path>
+                  <circle cx="12" cy="20" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="control-row-group collapsible-content collapsed" id="title-content">
+              <div class="control-row">
+                <label for="diagramTitle" class="control-label">Diagram Title Text:</label>
+                <input type="text" id="diagramTitle" class="control-input" placeholder="Enter diagram title..."
+                  oninput="updateDiagramTitle(this.value)">
+              </div>
+              <div class="control-row">
+                <label for="titleFontSize" class="control-label">Title Font Size:</label>
+                <input type="number" id="titleFontSize" class="control-input number-input" placeholder="Font size..."
+                  min="8" step="1" oninput="updateTitleFontSize(parseInt(this.value))">
+              </div>
+              <div class="control-row">
+                <label for="titlePositionX" class="control-label">Title X Position:</label>
+                <input type="number" id="titlePositionX" class="control-input number-input" placeholder="X position..."
+                  step="1" oninput="updateTitlePositionX(parseInt(this.value))">
+              </div>
+              <div class="control-row">
+                <label for="titlePositionY" class="control-label">Title Y Position:</label>
+                <input type="number" id="titlePositionY" class="control-input number-input" placeholder="Y position..."
+                  step="1" oninput="updateTitlePositionY(parseInt(this.value))">
+              </div>
+              <div class="control-row">
+                <label for="titleColor" class="control-label">Title Color:</label>
+                <input type="color" id="titleColor" class="control-input color-input"
+                  oninput="updateTitleColor(this.value)">
+              </div>
+            </div>
+
+            <!-- Legend Color Settings Group -->
+            <div class="control-group-header collapsible-header collapsed" data-target="carrier-colors-content"
+              onclick="toggleSection(this)">
+              <div class="header-left">
+                <button class="collapse-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+                <span>CARRIERS</span>
+              </div>
+              <button class="info-button"
+                data-tooltip="Unit: Defines the measurement unit displayed after flow values • Carrier Colors: Customize colors for each flow type/carrier • Shift+click legend items to edit names • Purge unused carriers to clean up obsolete entries">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14.26V16"></path>
+                  <circle cx="12" cy="20" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="collapsible-content collapsed" id="carrier-colors-content">
+              <div class="control-row">
+                <label for="unitSetting" class="control-label">Unit:</label>
+                <input type="text" id="unitSetting" class="control-input text-input" placeholder="Unit..."
+                  oninput="updateUnit(this.value)">
+              </div>
+              <div id="carrierColorControls">
+                <!-- Legend color controls will be dynamically generated here -->
+              </div>
+              <div class="button-container">
+                <button id="purgeUnusedButton" class="edit-btn destructive" onclick="purgeUnusedCarrierItems()"
+                  title="Remove carrier items that are not used by any flows">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                  Purge Unused Carriers
+                </button>
+              </div>
+            </div>
+
+            <!-- Others Group -->
+            <div class="control-group-header collapsible-header collapsed" data-target="others-content"
+              onclick="toggleSection(this)">
+              <div class="header-left">
+                <button class="collapse-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+                <span>Others</span>
+              </div>
+              <button class="info-button"
+                data-tooltip="Background Color: Sets the diagram background color • Transparent Background: Removes background for clean exports • Flow Opacity: Controls the transparency of all flow lines (0=invisible, 1=opaque) • Additional display and behavior settings for overall diagram appearance">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9,9h0a3,3,0,0,1,5.12,2.12h0A3,3,0,0,1,13,14.26V16"></path>
+                  <circle cx="12" cy="20" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="control-row-group collapsible-content collapsed" id="others-content">
+              <div class="control-row">
+                <label for="backgroundColor" class="control-label">Background Color:</label>
+                <input type="color" id="backgroundColor" class="control-input color-input"
+                  oninput="updateBackgroundColor(this.value)">
+              </div>
+              <div class="control-row">
+                <label class="control-label">Transparent Background:</label>
+                <div class="toggle-controls">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="transparentBackgroundToggle" onchange="updateTransparentBackground()">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="control-row">
+                <label for="globalFlowOpacity" class="control-label">Flow Opacity:</label>
+                <div class="number-controls">
+                  <input type="number" id="globalFlowOpacity" class="control-input number-input" min="0" max="1"
+                    step="0.1" value="0.9" style="width: 70px" onchange="updateGlobalFlowOpacity(this.value)"
+                    onkeyup="if(event.key === 'Enter') updateGlobalFlowOpacity(this.value)">
+                </div>
+              </div>
+              <div class="control-row">
+                <label for="decimalsRoundValues" class="control-label">Value Decimals:</label>
+                <div class="number-controls">
+                  <input type="number" id="decimalsRoundValues" class="control-input number-input" min="0" max="5"
+                    step="1" value="1" style="width: 70px" onchange="updateDecimalsRoundValues(this.value)"
+                    onkeyup="if(event.key === 'Enter') updateDecimalsRoundValues(this.value)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Hidden file input for Excel import -->
+          <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;"
+            onchange="handleExcelImport(event)">
+        </div>
+        <!-- Selection buttons removed for simplified version -->
+
+
+        <!-- <div class="content-constrained" style="padding-bottom:0px;padding-top:30px;">
+          </div> -->
+      </div>
+
+      <div class="content-fullwidth" style="background-color: #EEF5FA;">
+        <!-- Editing Controls -->
+        <div class="editing-controls">
+          <button id="addNodeButton" class="edit-btn" onclick="openAddNodePopup()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Add Node
+          </button>
+          <button id="addFlowButton" class="edit-btn" onclick="openAddFlowPopup()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+              <path d="m15 5 4 4"></path>
+            </svg>
+            Add Flow
+          </button>
+          <button id="addCarrierButton" class="edit-btn" onclick="openAddCarrierPopup()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
+            </svg>
+            Add Carrier
+          </button>
+        </div>
+
+        <div id="PNGexportCanvas">
+          <!-- Editing Popups -->
+          <div id="editPopupContainer" class="popup-overlay" style="display: none;">
+            <!-- Link Edit Popup -->
+            <div id="linkEditPopup" class="edit-popup" style="display: none;">
+              <div class="popup-header">
+                <h3>Edit Flow</h3>
+                <button class="close-btn" onclick="closeEditPopup()">&times;</button>
+              </div>
+              <div class="popup-content">
+                <div class="form-row">
+                  <label>Source Node:</label>
+                  <select id="linkSourceSelect"></select>
+                </div>
+                <div class="form-row">
+                  <label>Target Node:</label>
+                  <select id="linkTargetSelect"></select>
+                </div>
+                <div class="form-row">
+                  <label>Value:</label>
+                  <input type="number" id="linkValueInput" step="0.01">
+                </div>
+                <div class="form-row">
+                  <label>Legend Type:</label>
+                  <select id="linkLegendSelect"></select>
+                </div>
+                <div class="form-row">
+                  <label>Direction:</label>
+                  <select id="linkDirectionSelect">
+                    <option value="l">Left (l)</option>
+                    <option value="r">Right (r)</option>
+                  </select>
+                </div>
+                <div class="popup-buttons">
+                  <button class="btn-cancel" onclick="closeEditPopup()">Cancel</button>
+                  <button class="btn-delete" onclick="deleteLink()">Delete</button>
+                  <button class="btn-save" onclick="saveLinkEdit()">Save</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Node Edit Popup -->
+            <div id="nodeEditPopup" class="edit-popup" style="display: none;">
+              <div class="popup-header">
+                <h3>Edit Node</h3>
+                <button class="close-btn" onclick="closeEditPopup()">&times;</button>
+              </div>
+              <div class="popup-content">
+                <div class="form-row">
+                  <label>Node ID:</label>
+                  <input type="text" id="nodeIdInput">
+                </div>
+                <div class="form-row">
+                  <label>Node Name:</label>
+                  <input type="text" id="nodeNameInput">
+                </div>
+                <div class="form-row">
+                  <label>X Position:</label>
+                  <input type="number" id="nodeXInput" step="1">
+                </div>
+                <div class="form-row">
+                  <label>Y Position:</label>
+                  <input type="number" id="nodeYInput" step="1">
+                </div>
+                <div class="form-row">
+                  <label>Label Position:</label>
+                  <select id="nodeLabelPositionSelect">
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Direction:</label>
+                  <select id="nodeDirectionSelect">
+                    <option value="l">Left (l)</option>
+                    <option value="r">Right (r)</option>
+                  </select>
+                </div>
+                <div class="popup-buttons">
+                  <button class="btn-cancel" onclick="closeEditPopup()">Cancel</button>
+                  <button class="btn-delete" onclick="deleteNode()">Delete</button>
+                  <button class="btn-save" onclick="saveNodeEdit()">Save</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Node Popup -->
+            <div id="addNodePopup" class="edit-popup" style="display: none;">
+              <div class="popup-header">
+                <h3>Add New Node</h3>
+                <button class="close-btn" onclick="closeEditPopup()">&times;</button>
+              </div>
+              <div class="popup-content">
+                <div class="form-row">
+                  <label>Node ID:</label>
+                  <input type="text" id="newNodeIdInput" placeholder="unique_node_id">
+                </div>
+                <div class="form-row">
+                  <label>Node Name:</label>
+                  <input type="text" id="newNodeNameInput" placeholder="Display Name">
+                </div>
+                <div class="form-row">
+                  <label>X Position:</label>
+                  <input type="number" id="newNodeXInput" step="1" placeholder="Auto-generated">
+                </div>
+                <div class="form-row">
+                  <label>Y Position:</label>
+                  <input type="number" id="newNodeYInput" step="1" placeholder="Auto-generated">
+                </div>
+                <div class="popup-buttons">
+                  <button class="btn-cancel" onclick="closeEditPopup()">Cancel</button>
+                  <button class="btn-save" onclick="saveNewNode()">Add Node</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Flow Popup -->
+            <div id="addFlowPopup" class="edit-popup" style="display: none;">
+              <div class="popup-header">
+                <h3>Add New Flow</h3>
+                <button class="close-btn" onclick="closeEditPopup()">&times;</button>
+              </div>
+              <div class="popup-content">
+                <div class="form-row">
+                  <label>Source Node:</label>
+                  <select id="newFlowSourceSelect"></select>
+                </div>
+                <div class="form-row">
+                  <label>Target Node:</label>
+                  <select id="newFlowTargetSelect"></select>
+                </div>
+                <div class="form-row">
+                  <label>Value:</label>
+                  <input type="number" id="newFlowValueInput" step="0.01" value="1">
+                </div>
+                <div class="form-row">
+                  <label>Legend Type:</label>
+                  <select id="newFlowLegendSelect"></select>
+                </div>
+                <div class="popup-buttons">
+                  <button class="btn-cancel" onclick="closeEditPopup()">Cancel</button>
+                  <button class="btn-save" onclick="saveNewFlow()">Add Flow</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Carrier Popup -->
+            <div id="addCarrierPopup" class="edit-popup" style="display: none;">
+              <div class="popup-header">
+                <h3>Add New Carrier</h3>
+                <button class="close-btn" onclick="closeEditPopup()">&times;</button>
+              </div>
+              <div class="popup-content">
+                <div class="form-row">
+                  <label>Carrier Name (ID):</label>
+                  <input type="text" id="newCarrierIdInput" placeholder="e.g., electricity, heat, gas">
+                </div>
+                <div class="form-row">
+                  <label>Display Name:</label>
+                  <input type="text" id="newCarrierNameInput" placeholder="e.g., Electricity, Heat, Natural Gas">
+                </div>
+                <div class="form-row">
+                  <label>Color:</label>
+                  <input type="color" id="newCarrierColorInput" value="#3498db">
+                </div>
+                <div class="popup-buttons">
+                  <button class="btn-cancel" onclick="closeEditPopup()">Cancel</button>
+                  <button class="btn-save" onclick="saveNewCarrier()">Add Carrier</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Manual Popup -->
+            <div id="manualPopup" class="edit-popup" style="display: none; width: 800px; max-width: 95vw;">
+              <div class="popup-header">
+                <h3>FLUX User Manual</h3>
+                <button class="close-btn" onclick="closeEditPopup()">&times;</button>
+              </div>
+              <div class="popup-content" style="max-height: 80vh; overflow-y: auto;">
+                <div class="manual-content">
+                  <!-- Quick Start Section -->
+                  <section class="manual-section">
+                    <h2>
+                      <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                      </svg>
+                      Quick Start Guide
+                    </h2>
+                    <div class="quick-tips">
+                      <div class="tip-item">
+                        <svg class="tip-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14,2 14,8 20,8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                          <polyline points="10,9 9,9 8,9"></polyline>
+                        </svg>
+                        <strong>Import Data: &nbsp;</strong> Use "Import XLSX" to load your Sankey diagram data
+                      </div>
+                      <div class="tip-item">
+                        <svg class="tip-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <circle cx="13.5" cy="6.5" r=".5"></circle>
+                          <circle cx="17.5" cy="10.5" r=".5"></circle>
+                          <circle cx="8.5" cy="7.5" r=".5"></circle>
+                          <circle cx="6.5" cy="12.5" r=".5"></circle>
+                          <path
+                            d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z">
+                          </path>
+                        </svg>
+                        <strong>Customize:&nbsp;</strong> Use the control panel on the left to adjust colors, sizing,
+                        and
+                        layout
+                      </div>
+                      <div class="tip-item">
+                        <svg class="tip-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        <strong>Edit:&nbsp;</strong> Click flows to edit values, Shift+click nodes to edit properties
+                      </div>
+                      <div class="tip-item">
+                        <svg class="tip-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7,10 12,15 17,10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <strong>Export:&nbsp;</strong> Save as PNG, SVG, or updated XLSX file
+                      </div>
+                      <div class="tip-item">
+                        <svg class="tip-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M9 12l2 2 4-4"></path>
+                          <path d="M21 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"></path>
+                          <path d="M3 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"></path>
+                          <path d="M12 21c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"></path>
+                          <path d="M12 3c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"></path>
+                        </svg>
+                        <strong>Balance Check:&nbsp;</strong> View node balance status below the diagram
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Data Management -->
+                  <section class="manual-section">
+                    <h2>
+                      <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10,9 9,9 8,9"></polyline>
+                      </svg>
+                      Data Management
+                    </h2>
+                    <h3>Importing Data</h3>
+                    <p>FLUX works with Excel files containing specific sheets:</p>
+                    <ul>
+                      <li><strong>Links:</strong> Flow connections with source, target, value, and carrier type</li>
+                      <li><strong>Nodes:</strong> Node positions, names, and properties</li>
+                      <li><strong>Carriers:</strong> Color definitions for different flow types</li>
+                      <li><strong>Settings:</strong> Diagram configuration (title, scaling, colors, etc.)</li>
+                    </ul>
+
+                    <h3>Exporting Data</h3>
+                    <p>Export your work in multiple formats:</p>
+                    <ul>
+                      <li><strong>XLSX:</strong> Complete data with all modifications preserved</li>
+                      <li><strong>PNG:</strong> High-quality image for presentations and reports</li>
+                      <li><strong>SVG:</strong> Vector format for scalable graphics</li>
+                    </ul>
+                  </section>
+
+                  <!-- Editing Features -->
+                  <section class="manual-section">
+                    <h2>
+                      <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      Interactive Editing
+                    </h2>
+                    <h3>Flow Editing</h3>
+                    <ul>
+                      <li><strong>Click a flow:</strong> Edit source, target, value, and carrier type</li>
+                      <li><strong>Add new flows:</strong> Use "Add Flow" button to create connections</li>
+                      <li><strong>Delete flows:</strong> Use delete button in flow edit popup</li>
+                    </ul>
+
+                    <h3>Node Editing</h3>
+                    <ul>
+                      <li><strong>Shift+Click a node:</strong> Edit name, ID, and position</li>
+                      <li><strong>Drag nodes:</strong> Reposition with real-time coordinate display</li>
+                      <li><strong>Add new nodes:</strong> Use "Add Node" button to create new elements</li>
+                      <li><strong>Snap to grid:</strong> Enable grid snapping for precise positioning</li>
+                    </ul>
+
+                    <h3>Carriers Management</h3>
+                    <ul>
+                      <li><strong>Add carriers:</strong> Use "Add Carrier" to create new flow types</li>
+                      <li><strong>Edit colors:</strong> Shift+click carrier items to modify</li>
+                      <li><strong>Purge unused:</strong> Remove unused carrier entries automatically</li>
+                    </ul>
+                  </section>
+
+                  <!-- Control Panel -->
+                  <section class="manual-section">
+                    <h2>
+                      <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M4 21v-7"></path>
+                        <path d="M4 10V3"></path>
+                        <path d="M12 21v-9"></path>
+                        <path d="M12 8V3"></path>
+                        <path d="M20 21v-5"></path>
+                        <path d="M20 12V3"></path>
+                        <line x1="1" y1="14" x2="7" y2="14"></line>
+                        <line x1="9" y1="8" x2="15" y2="8"></line>
+                        <line x1="17" y1="16" x2="23" y2="16"></line>
+                      </svg>
+                      Control Panel
+                    </h2>
+                    <h3>Scaling & Size</h3>
+                    <ul>
+
+                      <li><strong>Unit-to-pixel scaling:</strong> Vertical scaling of the diagram</li>
+                      <li><strong>Canvas scaling:</strong> Overall diagram zoom level</li>
+                      <li><strong>Canvas Width/Height:</strong> Diagram dimensions</li>
+                    </ul>
+
+                    <h3>Node Positioning</h3>
+                    <ul>
+                      <li><strong>Snap to Grid:</strong> Enable/disable grid-based positioning</li>
+                      <li><strong>Grid Size:</strong> Spacing between grid points</li>
+                      <li><strong>Node Width:</strong> Thickness of node rectangles</li>
+                      <li><strong>Node Color:</strong> Fill color for all nodes</li>
+                      <li><strong>Show Value Labels:</strong> Display values next to nodes</li>
+                    </ul>
+
+                    <h3>Title Customization</h3>
+                    <ul>
+                      <li><strong>Title Text:</strong> Main diagram heading</li>
+                      <li><strong>Font Size:</strong> Title text size</li>
+                      <li><strong>Position:</strong> X/Y coordinates for title placement</li>
+                      <li><strong>Color:</strong> Title text color</li>
+                    </ul>
+
+                    <h3>Colors (Flows)</h3>
+                    <ul>
+                      <li><strong>Carrier Colors:</strong> Individual colors for each carrier type</li>
+                      <li><strong>Multi-column Layout:</strong> Organized color picker grid</li>
+                      <li><strong>Real-time Updates:</strong> Changes apply immediately to diagram</li>
+                    </ul>
+                  </section>
+
+                  <!-- Advanced Features -->
+                  <section class="manual-section">
+                    <h2>
+                      <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path
+                          d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
+                        </path>
+                      </svg>
+                      Advanced Features
+                    </h2>
+                    <h3>Node Balance Checking</h3>
+                    <p>FLUX automatically analyzes your diagram for mass/energy balance:</p>
+                    <ul>
+                      <li><strong>Balanced Nodes:</strong> Incoming ≈ Outgoing flows (within 1 unit of tolerance)</li>
+                      <li><strong>Unbalanced Nodes:</strong> Significant flow differences flagged</li>
+                      <li><strong>Source/Sink Exclusion:</strong> Root and terminal nodes are not checked</li>
+                      <li><strong>Critical Alerts:</strong> Major imbalances highlighted in red</li>
+                    </ul>
+
+                    <h3>Background Options</h3>
+                    <ul>
+                      <li><strong>Background Color:</strong> Solid color behind diagram</li>
+                      <li><strong>Transparent Background:</strong> No background for overlays</li>
+                      <li><strong>Export Consistency:</strong> Background settings carry to exports</li>
+                    </ul>
+
+                  </section>
+
+                  <!-- Tips & Best Practices -->
+                  <section class="manual-section">
+                    <h2>
+                      <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                      </svg>
+                      Tips & Best Practices
+                    </h2>
+                    <h3>Data Preparation</h3>
+                    <ul>
+                      <li>Use consistent node IDs across your Excel sheets</li>
+                      <li>Define all carrier types before creating flows</li>
+                      <li>Keep node names descriptive but concise</li>
+                      <li>Use logical flow values (positive numbers)</li>
+                    </ul>
+
+                    <h3>Visual Design</h3>
+                    <ul>
+                      <li>Choose colors that provide good contrast</li>
+                      <li>Use snap-to-grid for professional alignment</li>
+                      <li>Consider your audience when setting label visibility</li>
+                      <li>Test different export formats for your use case</li>
+                    </ul>
+
+                    <h3>Performance</h3>
+                    <ul>
+                      <li>Large diagrams may benefit from reduced scale values</li>
+                      <li>Use "Bring Nodes Into View" button under 'nodes' section if elements go off-screen</li>
+                      <li>Purge unused carriers to keep carriers list clean</li>
+                      <li>Exporting to PNG is most stable, exporting to SVG may result in issues with fonts</li>
+                      <li>Save work frequently by exporting to XLSX (FLUX has no UNDO functionality)</li>
+                    </ul>
+                  </section>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="SVGContainer_energyflows"> </div>
+
+
+        </div>
+      </div>
+      <div class="content-fullwidth">
+        <!-- Node Balance Status -->
+        <div class="node-balance-section">
+          <div class="balance-header">
+            <h3 class="balance-title">Node Balance Check</h3>
+            <div class="balance-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9,12l2,2 4,-4"></path>
+              </svg>
+              <span class="balance-tooltip">Shows nodes where incoming and outgoing flows differ by more than 1
+                unit</span>
+            </div>
+          </div>
+          <div id="nodeBalanceContent" class="balance-content">
+            <div class="balance-placeholder">Balance information will appear here after diagram is loaded...</div>
+          </div>
+        </div>
+      </div>
+      <!-- All sections after Sankey removed for simplified version -->
+
+      <!-- Console Log Display Section -->
+      <!-- <div class="content-fullwidth" style="background-color: #EEF5FA; border-top: 2px solid #e9ecef;">
+        <div class="content-constrained" style="padding-right: 65px; padding-left: 20px;">
+          <div class="console-log-section">
+            <div class="console-header">
+              <h3 class="console-title">Log</h3>
+              <div class="console-controls">
+                <button id="clearConsoleBtn" class="console-btn clear">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18"></path>
+                    <path d="m19 6-2 14c0 1-1 2-2 2H9c-1 0-2-1-2-2L5 6"></path>
+                    <path d="m8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                  </svg>
+                  Clear
+                </button>
+                <button id="toggleConsoleBtn" class="console-btn toggle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                  Collapse
+                </button>
+              </div>
+            </div>
+            <div id="consoleLogContainer" class="console-log-container">
+              <div class="console-placeholder">Console messages will appear here...</div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- <div class=" content-fullwidth" style="height:600px;"></div> -->
+    </div>
+  </div>
+  </div>
+  <script src="js/scrollBehavior.js"></script>
+  <!-- <script src="js/consoleLogger.js"></script> -->
+
+
+</body>
+<script src="js/jszip.min.js"></script>
+<script src="js/jszip-utils.min.js"></script>
+<script src="js/UIlisteners.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/xlsx.full.min.js"></script>
+<script src="js/d3-collection.v1.min.js"></script>
+<script src="js/d3-sankey-diagram.js"></script>
+<script src="js/drawSankey.js"></script>
+<script src="js/loadData.js"></script>
+<!-- <script src="js/drawRemarks.js"></script> -->
+<script src="js/fileLoadButton.js"></script>
+<script src="js/drawMainContainer.js" charset="utf-8"></script>
+<script src="js/flux.js"></script>
+
+</html>
