@@ -2510,12 +2510,13 @@ function updateDiagramTitle(newTitle) {
       // console.log('No existing title found, attempting full redraw');
 
       // Try the most complete redraw approach - call processData again
-      if (window.processData && window.nodesGlobal && window.legend && window.settings && window.remarks && window.links) {
+      const carriersData = window.legend || window.carriers;
+      if (window.processData && window.nodesGlobal && carriersData && window.settings && window.remarks && window.links) {
         // console.log('Using processData approach');
         try {
           // Reset the selectionButtonsHaveInitialized flag so buttons get redrawn
           window.selectionButtonsHaveInitialized = false;
-          window.processData(window.links, window.nodesGlobal, window.legend, window.settings, window.remarks, config);
+          window.processData(window.links, window.nodesGlobal, carriersData, window.settings, window.remarks, config);
           // console.log('processData completed successfully');
         } catch (error) {
           console.error('Error in processData approach:', error);
@@ -2588,7 +2589,8 @@ function updateScaleDataValue(newScale) {
       // console.log('Updated scaleDataValue to:', newScale);
 
       // For scale changes, we MUST do a full reload since it affects data processing
-      if (window.processData && window.nodesGlobal && window.legend && window.settings && window.remarks && window.originalLinksData) {
+      const carriersData = window.legend || window.carriers;
+      if (window.processData && window.nodesGlobal && carriersData && window.settings && window.remarks && window.originalLinksData) {
         // console.log('Performing full reload with processData using original data');
         try {
           // Update the global settings
@@ -2601,7 +2603,7 @@ function updateScaleDataValue(newScale) {
           window.selectionButtonsHaveInitialized = false;
 
           // Call processData with the fresh unscaled data and new scale
-          window.processData(freshLinksData, window.nodesGlobal, window.legend, window.settings, window.remarks, config);
+          window.processData(freshLinksData, window.nodesGlobal, carriersData, window.settings, window.remarks, config);
           // console.log('Full reload completed successfully with scale:', newScale);
         } catch (error) {
           console.error('Error in full reload:', error);
@@ -2611,6 +2613,8 @@ function updateScaleDataValue(newScale) {
           processData: !!window.processData,
           nodesGlobal: !!window.nodesGlobal,
           legend: !!window.legend,
+          carriers: !!window.carriers,
+          carriersData: !!(window.legend || window.carriers),
           settings: !!window.settings,
           remarks: !!window.remarks,
           originalLinksData: !!window.originalLinksData
@@ -2657,7 +2661,8 @@ function updateScaleHeight(newScaleHeight) {
       // console.log('Updated scaleHeight to:', newScaleHeight);
 
       // For scale height changes, we MUST do a full reload since it affects layout
-      if (window.processData && window.nodesGlobal && window.legend && window.settings && window.remarks && window.originalLinksData) {
+      const carriersData = window.legend || window.carriers;
+      if (window.processData && window.nodesGlobal && carriersData && window.settings && window.remarks && window.originalLinksData) {
         // console.log('Performing full reload with processData using original data');
         try {
           // Update the global settings
@@ -2670,7 +2675,7 @@ function updateScaleHeight(newScaleHeight) {
           window.selectionButtonsHaveInitialized = false;
 
           // Call processData for complete reprocessing with new scale height
-          window.processData(freshLinksData, window.nodesGlobal, window.legend, window.settings, window.remarks, config);
+          window.processData(freshLinksData, window.nodesGlobal, carriersData, window.settings, window.remarks, config);
           // console.log('Full reload completed successfully with scale height:', newScaleHeight);
         } catch (error) {
           console.error('Error in full reload:', error);
@@ -2680,6 +2685,8 @@ function updateScaleHeight(newScaleHeight) {
           processData: !!window.processData,
           nodesGlobal: !!window.nodesGlobal,
           legend: !!window.legend,
+          carriers: !!window.carriers,
+          carriersData: !!(window.legend || window.carriers),
           settings: !!window.settings,
           remarks: !!window.remarks,
           originalLinksData: !!window.originalLinksData
@@ -3423,9 +3430,10 @@ function handleCarrierLabelClick(event, carrierId) {
       
       // console.log('Updating legend ID from', legendId, 'to', newValue);
       
-      // Update legend data
-      if (window.legend) {
-        const legendItem = window.legend.find(item => item.id === legendId);
+      // Update legend data (check both window.legend and window.carriers)
+      const legendData = window.legend || window.carriers;
+      if (legendData) {
+        const legendItem = legendData.find(item => item.id === legendId);
         if (legendItem) {
           legendItem.id = newValue;
         }
@@ -3632,7 +3640,8 @@ function updatecanvasWidth(newCanvasWidth) {
 
       // For scroll extent changes, we need to do a full reload since it affects SVG dimensions
       // But we should preserve the current diagram state by using the current processed data
-      if (window.processData && window.nodesGlobal && window.legend && window.settings && window.remarks) {
+      const carriersData = window.legend || window.carriers;
+      if (window.processData && window.nodesGlobal && carriersData && window.settings && window.remarks) {
         // console.log('Performing full reload with processData for scroll extent width');
         try {
           // Update the global settings
@@ -3657,7 +3666,7 @@ function updatecanvasWidth(newCanvasWidth) {
           window.selectionButtonsHaveInitialized = false;
 
           // Call processData with the preserved data and new setting
-          window.processData(linksDataToUse, window.nodesGlobal, window.legend, window.settings, window.remarks, config);
+          window.processData(linksDataToUse, window.nodesGlobal, carriersData, window.settings, window.remarks, config);
           // console.log('Full reload completed successfully with scroll width:', newCanvasWidth);
 
           // Apply showValueLabels setting after canvas width change (multiple passes to ensure it takes effect)
@@ -3746,6 +3755,8 @@ function updatecanvasWidth(newCanvasWidth) {
           processData: !!window.processData,
           nodesGlobal: !!window.nodesGlobal,
           legend: !!window.legend,
+          carriers: !!window.carriers,
+          carriersData: !!(window.legend || window.carriers),
           settings: !!window.settings,
           remarks: !!window.remarks,
           originalLinksData: !!window.originalLinksData
@@ -3795,7 +3806,8 @@ function updatecanvasHeight(newCanvasHeight) {
 
       // For scroll extent changes, we need to do a full reload since it affects SVG dimensions
       // But we should preserve the current diagram state by using the current processed data
-      if (window.processData && window.nodesGlobal && window.legend && window.settings && window.remarks) {
+      const carriersData = window.legend || window.carriers;
+      if (window.processData && window.nodesGlobal && carriersData && window.settings && window.remarks) {
         // console.log('Performing full reload with processData for scroll extent height');
         try {
           // Update the global settings
@@ -3820,7 +3832,7 @@ function updatecanvasHeight(newCanvasHeight) {
           window.selectionButtonsHaveInitialized = false;
 
           // Call processData with the preserved data and new setting
-          window.processData(linksDataToUse, window.nodesGlobal, window.legend, window.settings, window.remarks, config);
+          window.processData(linksDataToUse, window.nodesGlobal, carriersData, window.settings, window.remarks, config);
           // console.log('Full reload completed successfully with scroll height:', newCanvasHeight);
 
           // Apply showValueLabels setting after canvas height change (multiple passes to ensure it takes effect)
@@ -3909,6 +3921,8 @@ function updatecanvasHeight(newCanvasHeight) {
           processData: !!window.processData,
           nodesGlobal: !!window.nodesGlobal,
           legend: !!window.legend,
+          carriers: !!window.carriers,
+          carriersData: !!(window.legend || window.carriers),
           settings: !!window.settings,
           remarks: !!window.remarks,
           originalLinksData: !!window.originalLinksData
@@ -4500,8 +4514,21 @@ function populateLegendSelect(selectId) {
   const select = document.getElementById(selectId);
   select.innerHTML = '';
   
-  // Get current legend
-  const legend = window.legend || [];
+  // Get current legend (check multiple sources)
+  const legend = window.legend 
+    || window.carriers 
+    || (window.currentSankeyConfig && window.currentSankeyConfig.carriers)
+    || (window.currentSankeyConfig && window.currentSankeyConfig.legend)
+    || [];
+  
+  // Debug logging
+  if (legend.length === 0) {
+    console.warn('No legend/carriers data available to populate dropdown');
+    console.warn('window.legend:', window.legend);
+    console.warn('window.carriers:', window.carriers);
+    console.warn('window.currentSankeyConfig?.carriers:', window.currentSankeyConfig?.carriers);
+    console.warn('window.currentSankeyConfig?.legend:', window.currentSankeyConfig?.legend);
+  }
   
   legend.forEach(legendItem => {
     const option = document.createElement('option');
@@ -4513,8 +4540,9 @@ function populateLegendSelect(selectId) {
 
 // Link editing functions (make globally available)
 window.editLink = function editLink(linkData, linkElement) {
-  // console.log('=== EDIT LINK FUNCTION CALLED ===');
-  // console.log('Editing link:', linkData);
+  console.log('=== EDIT LINK FUNCTION CALLED ===');
+  console.log('Full linkData object:', linkData);
+  console.log('linkData.legend:', linkData.legend);
   currentEditingLink = { data: linkData, element: linkElement };
   
   // Extract source and target IDs (they might be objects or strings)
@@ -4554,7 +4582,27 @@ window.editLink = function editLink(linkData, linkElement) {
   // Set current values using extracted IDs
   document.getElementById('linkSourceSelect').value = sourceId;
   document.getElementById('linkTargetSelect').value = targetId;
-  document.getElementById('linkLegendSelect').value = linkData.legend;
+  
+  // Set legend/carrier value with better logging and error handling
+  const legendSelect = document.getElementById('linkLegendSelect');
+  // Check for both 'carrier' (new) and 'legend' (old) properties
+  const carrierValue = linkData.carrier || linkData.legend;
+  console.log('Setting carrier value from linkData.carrier or linkData.legend:', carrierValue);
+  console.log('linkData.carrier:', linkData.carrier, '| linkData.legend:', linkData.legend);
+  console.log('Available carrier options:', Array.from(legendSelect.options).map(o => o.value));
+  
+  if (carrierValue) {
+    legendSelect.value = carrierValue;
+    console.log('After setting, legendSelect.value is:', legendSelect.value);
+    // If value didn't set (option doesn't exist), log warning
+    if (legendSelect.value !== carrierValue) {
+      console.warn('Carrier type not found in options:', carrierValue);
+      console.warn('This means the carrier "' + carrierValue + '" does not exist in the carriers list');
+    }
+  } else {
+    console.warn('Both linkData.carrier and linkData.legend are empty or undefined');
+  }
+  
   document.getElementById('linkDirectionSelect').value = linkData.direction || 'r'; // Default to 'r' if not specified
   
   // Hide any existing popups first
@@ -4585,7 +4633,8 @@ window.saveLinkEdit = function saveLinkEdit() {
   currentEditingLink.data.source = newSource;
   currentEditingLink.data.target = newTarget;
   currentEditingLink.data.value = newValue;
-  currentEditingLink.data.legend = newLegend;
+  currentEditingLink.data.legend = newLegend; // Keep for backwards compatibility
+  currentEditingLink.data.carrier = newLegend; // New property name
   currentEditingLink.data.direction = newDirection;
   
   // Also update the corresponding entry in window.links array
@@ -4655,7 +4704,8 @@ window.saveLinkEdit = function saveLinkEdit() {
       }
       
       window.links[globalLinkIndex].value = newValue;
-      window.links[globalLinkIndex].legend = newLegend;
+      window.links[globalLinkIndex].legend = newLegend; // Keep for backwards compatibility
+      window.links[globalLinkIndex].carrier = newLegend; // New property name
       window.links[globalLinkIndex].direction = newDirection;
       
       // console.log('Original link was:', originalLink);
@@ -4683,7 +4733,8 @@ window.saveLinkEdit = function saveLinkEdit() {
       sankeyLink.source = newSource;
       sankeyLink.target = newTarget;
       sankeyLink.value = newValue;
-      sankeyLink.legend = newLegend;
+      sankeyLink.legend = newLegend; // Keep for backwards compatibility
+      sankeyLink.carrier = newLegend; // New property name (used in drawSankey)
       // console.log('Updated sankeyDataObject link:', sankeyLink);
     }
   }
@@ -5179,7 +5230,8 @@ window.saveNewFlow = function saveNewFlow() {
     source: newSource,       // Direct property format
     target: newTarget,
     value: newValue,
-    legend: newLegend,
+    legend: newLegend,       // Keep for backwards compatibility
+    carrier: newLegend,      // New property name
     type: 0,                 // Default type
     visibility: 1            // Visible by default
   };
@@ -5195,8 +5247,9 @@ window.saveNewFlow = function saveNewFlow() {
     
     // Get color for the legend
     let color = '#999'; // Default color
-    if (window.legend) {
-      const legendItem = window.legend.find(item => item.id === newLegend);
+    const legendData = window.legend || window.carriers;
+    if (legendData) {
+      const legendItem = legendData.find(item => item.id === newLegend);
       if (legendItem) {
         color = legendItem.color;
       }
@@ -5207,7 +5260,8 @@ window.saveNewFlow = function saveNewFlow() {
       source: newSource,
       target: newTarget,
       value: newValue,
-      legend: newLegend,
+      legend: newLegend,       // Keep for backwards compatibility
+      carrier: newLegend,      // New property name (used in drawSankey)
       color: color,
       type: 0,
       visibility: 1
@@ -5305,7 +5359,8 @@ function refreshDiagram() {
   // console.log('remarks available:', !!window.remarks, window.remarks ? window.remarks.length : 'N/A');
   // console.log('currentSankeyConfig available:', !!window.currentSankeyConfig);
   
-  if (window.processData && window.nodesGlobal && window.links && window.legend && window.settings && window.remarks && window.currentSankeyConfig) {
+  const carriersData = window.legend || window.carriers;
+  if (window.processData && window.nodesGlobal && window.links && carriersData && window.settings && window.remarks && window.currentSankeyConfig) {
     // console.log('All data available, proceeding with refresh...');
     
     try {
@@ -5329,7 +5384,7 @@ function refreshDiagram() {
       
       // First try: use processData if available
       if (typeof window.processData === 'function') {
-        window.processData(freshLinksData, window.nodesGlobal, window.legend, window.settings, window.remarks, window.currentSankeyConfig);
+        window.processData(freshLinksData, window.nodesGlobal, carriersData, window.settings, window.remarks, window.currentSankeyConfig);
       }
       // Fallback: try direct diagram redraw
       else if (typeof window.drawSankey === 'function' && window.sankeyDataObject) {
@@ -5540,7 +5595,8 @@ window.debugLegendState = function() {
 window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
   // console.log('=== PURGING UNUSED LEGEND ITEMS ===');
   
-  if (!window.legend || !Array.isArray(window.legend)) {
+  const legendData = window.legend || window.carriers;
+  if (!legendData || !Array.isArray(legendData)) {
     alert('No legend data found');
     return;
   }
@@ -5568,10 +5624,10 @@ window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
   }
   
   // console.log('Used legend types:', Array.from(usedLegendTypes));
-  // console.log('Total legend items before purge:', window.legend.length);
+  // console.log('Total legend items before purge:', legendData.length);
   
   // Find unused legend items
-  const unusedItems = window.legend.filter(legendItem => 
+  const unusedItems = legendData.filter(legendItem => 
     !usedLegendTypes.has(legendItem.id)
   );
   
@@ -5591,13 +5647,14 @@ window.purgeUnusedLegendItems = function purgeUnusedCarrierItems() {
     return;
   }
   
-  // Remove unused items from window.legend
-  const usedItems = window.legend.filter(legendItem => 
+  // Remove unused items (update both window.legend and window.carriers)
+  const usedItems = legendData.filter(legendItem => 
     usedLegendTypes.has(legendItem.id)
   );
   
   // console.log('Keeping', usedItems.length, 'used legend items');
-  window.legend = usedItems;
+  if (window.legend) window.legend = usedItems;
+  if (window.carriers) window.carriers = usedItems;
   
   // Also update currentSankeyConfig.legend if it exists
   if (window.currentSankeyConfig && window.currentSankeyConfig.legend) {
@@ -6168,7 +6225,7 @@ window.verifyLegendExportData = function verifyLegendExportData() {
   const missingInExport = Array.from(usedTypes).filter(type => !exportedIds.has(type));
   
   if (unusedInExport.length > 0) {
-    console.warn('Legend items in export but not used by links:', unusedInExport);
+    console.warn('Carrier items in export but not used by links:', unusedInExport);
   }
   
   if (missingInExport.length > 0) {
@@ -6284,7 +6341,8 @@ window.testRefreshDiagram = function() {
 window.checkAndFixLegendEntries = function() {
   // console.log('=== CHECKING LEGEND ENTRIES ===');
   
-  if (!window.links || !window.legend) {
+  const legendData = window.legend || window.carriers;
+  if (!window.links || !legendData) {
     // console.log('No links or legend data available');
     return;
   }
@@ -6294,7 +6352,7 @@ window.checkAndFixLegendEntries = function() {
   // console.log('Legend types used in links:', usedLegendTypes);
   
   // Get existing legend IDs
-  const existingLegendIds = window.legend.map(item => item.id);
+  const existingLegendIds = legendData.map(item => item.id);
   // console.log('Existing legend IDs:', existingLegendIds);
   
   // Find missing legend entries
