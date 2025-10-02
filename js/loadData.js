@@ -133,7 +133,8 @@ async function decryptZipFile(passphrase) {
   }
 }
 
-let XLSXurl = 'public/fluxdata_example_file.xlsx'
+let XLSXurl = 'data/fluxdata_example_file.xlsx'
+let YAMLurl = 'data/fluxdata_example_file.yaml'
 
 
 function initTool () {
@@ -146,7 +147,8 @@ function initTool () {
   // console.log(sankeyConfigs)
 
   if (dataSource == 'url') {
-    readExcelFile(XLSXurl, (rawSankeyData) => {
+    // Load YAML file instead of Excel
+    readYAMLFile(YAMLurl, (rawSankeyData) => {
 
       d3.select('#loadFileDialog').style('visibility', 'hidden').style('pointer-events', 'none')
       d3.selectAll('.buttonTitles').style('visibility', 'visible')
@@ -326,6 +328,65 @@ function readExcelFile (url, callback) {
   xhr.open('GET', url, true)
   xhr.responseType = 'arraybuffer'
   xhr.send()
+}
+
+// Function to read YAML file from URL
+function readYAMLFile(url, callback) {
+  console.log('Loading YAML file from:', url);
+  
+  // Create XMLHttpRequest to fetch the YAML file
+  const xhr = new XMLHttpRequest();
+  
+  xhr.onload = () => {
+    try {
+      // Parse YAML data
+      const yamlText = xhr.responseText;
+      const data = jsyaml.load(yamlText);
+      console.log('YAML file loaded and parsed successfully:', data);
+      
+      // Store the original filename for export purposes
+      const filename = url.split('/').pop();
+      window.originalFilename = filename;
+      console.log('Stored original filename from URL:', filename);
+      
+      // Convert YAML data to the same format as generateSankeyLibrary
+      // The YAML has a flat structure, we need to nest it like the Excel format
+      const sankeyDataLibrary = {
+        links: { '': data.links || [] },
+        nodes: { '': data.nodes || [] },
+        carriers: { '': data.carriers || [] },
+        settings: { '': data.settings || [] },
+        remarks: { '': data.remarks || [] }
+      };
+      
+      // Store the original data for export purposes
+      window.originalExcelData = {
+        nodes: JSON.parse(JSON.stringify(data.nodes)),
+        links: JSON.parse(JSON.stringify(data.links)),
+        carriers: JSON.parse(JSON.stringify(data.carriers)),
+        settings: JSON.parse(JSON.stringify(data.settings)),
+        remarks: JSON.parse(JSON.stringify(data.remarks || []))
+      };
+      
+      console.log('Generated sankeyDataLibrary from YAML:', sankeyDataLibrary);
+      
+      // Call the callback with the formatted data
+      callback(sankeyDataLibrary);
+    } catch (error) {
+      console.error('Error parsing YAML file:', error);
+      alert('Failed to load YAML file: ' + error.message);
+    }
+  };
+  
+  xhr.onerror = () => {
+    console.error('Error loading YAML file from:', url);
+    alert('Failed to load YAML file from server');
+  };
+  
+  // Fetch the YAML file
+  xhr.open('GET', url, true);
+  xhr.responseType = 'text';
+  xhr.send();
 }
 
 function generateSankeyLibrary (workbook) {

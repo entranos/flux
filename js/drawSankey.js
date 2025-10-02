@@ -264,6 +264,10 @@ function processData (links, nodes, legend, settings, remarks, config) {
       .linkColor((d) => d.color)
   }
 
+  // Make sankeyDataObject globally available for tick() function
+  window.sankeyDataObject = sankeyDataObject
+  // console.log('Set window.sankeyDataObject with', sankeyDataObject.links.length, 'links and', sankeyDataObject.nodes.length, 'nodes')
+
   drawSankey(sankeyDataObject, config)
 
   // Apply initial nodeWidth setting from Excel data
@@ -383,6 +387,10 @@ function processData (links, nodes, legend, settings, remarks, config) {
       window.checkNodeBalance()
     }
   }, 1000) // Give the diagram time to fully render
+
+  // Trigger the actual diagram rendering by calling tick
+  // console.log('processData complete - calling tick to render diagram')
+  tick(config)
 }
 
 function getColor (id, carriers) {
@@ -401,7 +409,7 @@ function getColor (id, carriers) {
 }
 
 function drawSankey (sankeyDataInput, config) {
-  // console.log('=== DRAW SANKEY DEBUG ===')
+  // console.log('=== DRAW SANKEY CALLED ===')
   // console.log('drawSankey called with:', sankeyDataInput.links.length, 'links and', sankeyDataInput.nodes.length, 'nodes')
   // console.log('Config:', {
   //   sankeyInstanceID: config.sankeyInstanceID,
@@ -617,8 +625,11 @@ function tick (config) {
   // console.log('tick called with config:', config.sankeyInstanceID)
   // console.log('sankeyInstances keys:', Object.keys(sankeyInstances))
   // console.log('sankeyData available:', !!sankeyData)
-  // console.log('sankeyData links length:', sankeyData ? sankeyData.links.length : 'N/A')
-  // console.log('sankeyData nodes length:', sankeyData ? sankeyData.nodes.length : 'N/A')
+  // console.log('sankeyDataObject available:', !!sankeyDataObject)
+  // console.log('sankeyDataObject links length:', sankeyDataObject ? sankeyDataObject.links.length : 'N/A')
+  // console.log('sankeyDataObject nodes length:', sankeyDataObject ? sankeyDataObject.nodes.length : 'N/A')
+  // console.log('config.scenarios:', config.scenarios)
+  // console.log('activeScenario:', activeScenario)
 
   Object.keys(sankeyInstances).forEach(key => {
     // console.log(globalActiveEnergyflowsSankey.id)
@@ -646,8 +657,10 @@ function tick (config) {
           sankeyData.links[i].value = Math.round(rawValue * multiplier) / multiplier
         }
       } else {
-        console.warn('Scenario not found:', { activeScenario, configScenarios: config.scenarios })
-        sankeyData.links[i].value = 0
+        // No scenarios - links already have their values set, just keep them
+        // console.log('No scenarios configured, using link.value directly for link', i, ':', sankeyData.links[i].value)
+        // Don't set to 0! The link already has a value property from the data
+        // sankeyData.links[i].value should already be set from processData
       }
     }
 

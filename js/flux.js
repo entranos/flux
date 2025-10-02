@@ -356,6 +356,16 @@ function cleanLinksForExport(links) {
       cleanLink['target.id'] = link.target;
     }
     
+    // Ensure carrier property is set (fallback to legend if carrier doesn't exist)
+    if (!cleanLink.carrier && cleanLink.legend) {
+      cleanLink.carrier = cleanLink.legend;
+    }
+    
+    // Ensure type property exists (default to 0 if missing)
+    if (cleanLink.type === undefined || cleanLink.type === null) {
+      cleanLink.type = 0;
+    }
+    
     return cleanLink;
   });
 }
@@ -1046,6 +1056,798 @@ function exportToExcel() {
     console.error('Error exporting to Excel:', error);
     alert('Failed to export Excel file. Please check the console for details.');
   }
+}
+
+// ========================================
+// EXPORT FORMAT MANAGEMENT (JSON/YAML)
+// ========================================
+
+// Get the current export format from localStorage (default: 'json')
+function getExportFormat() {
+  return localStorage.getItem('diagramExportFormat') || 'json';
+}
+
+// Set the export format in localStorage
+function setExportFormat(format) {
+  localStorage.setItem('diagramExportFormat', format);
+}
+
+// Update button labels based on format
+function updateButtonLabels(format) {
+  const formatUpper = format.toUpperCase();
+  document.getElementById('importButtonLabel').textContent = `Import ${formatUpper}`;
+  document.getElementById('exportButtonLabel').textContent = `Export ${formatUpper}`;
+}
+
+// Handle format change from dropdown
+function updateExportFormat(format) {
+  setExportFormat(format);
+  updateButtonLabels(format);
+  // console.log(`Export format changed to: ${format.toUpperCase()}`);
+}
+
+// Initialize export format on page load
+function initializeExportFormat() {
+  const savedFormat = getExportFormat();
+  const formatSelect = document.getElementById('exportFormat');
+  if (formatSelect) {
+    formatSelect.value = savedFormat;
+    updateButtonLabels(savedFormat);
+  }
+}
+
+// Wrapper function for export - calls JSON or YAML based on setting
+function exportData() {
+  const format = getExportFormat();
+  if (format === 'yaml') {
+    exportToYAML();
+  } else {
+    exportToJSON();
+  }
+}
+
+// Wrapper function for import - calls JSON or YAML based on setting
+function importData() {
+  const format = getExportFormat();
+  if (format === 'yaml') {
+    importYAMLFile();
+  } else {
+    importJSONFile();
+  }
+}
+
+// Make functions globally available
+window.updateExportFormat = updateExportFormat;
+window.exportData = exportData;
+window.importData = importData;
+
+// JSON Export Function
+function exportToJSON() {
+  // console.log('=== JSON EXPORT STARTED ===');
+
+  // Get current data with all modifications
+  const currentNodes = window.nodesGlobal || (sankeyDataObject && sankeyDataObject.nodes ? sankeyDataObject.nodes : []);
+  const rawLinks = window.links || window.originalLinksData;
+  const currentLinks = cleanLinksForExport(rawLinks);
+  const currentCarriers = window.carriers || window.legend || [];
+  const currentSettings = window.settings || [];
+  const currentRemarks = window.remarks || [];
+
+  if (!currentNodes || !currentLinks || !currentCarriers || !currentSettings) {
+    alert('Missing current data for export. Please ensure the diagram is fully loaded.');
+    return;
+  }
+
+  // Create updated nodes data with current positions
+  const updatedNodes = currentNodes.map(node => {
+    const originalNode = window.originalExcelData && window.originalExcelData.nodes 
+      ? window.originalExcelData.nodes.find(n => n.id === node.id) || {}
+      : {};
+    return {
+      id: node.id || originalNode.id,
+      title: node.title || originalNode.title,
+      x: node.x !== undefined ? node.x : (node.x0 !== undefined ? node.x0 : originalNode.x),
+      y: node.y !== undefined ? node.y : (node.y0 !== undefined ? node.y0 : originalNode.y),
+      direction: node.direction || originalNode.direction,
+      labelposition: node.labelposition || originalNode.labelposition
+    };
+  });
+
+  // Transform settings back to original format (reverse the transformData function)
+  // Settings are stored as [{key1: value1, key2: value2, ...}]
+  // Need to convert to [{setting: key1, waarde: value1}, {setting: key2, waarde: value2}, ...]
+  const updatedSettings = [];
+  if (currentSettings && currentSettings[0]) {
+    Object.keys(currentSettings[0]).forEach(key => {
+      updatedSettings.push({
+        setting: key,
+        waarde: currentSettings[0][key]
+      });
+    });
+  }
+
+  // Ensure all control panel settings are included in the export
+  const controlPanelInputs = [
+    { id: 'scaleDataValue', setting: 'scaleDataValue', type: 'number' },
+    { id: 'scaleHeight', setting: 'scaleHeight', type: 'number' },
+    { id: 'scaleCanvas', setting: 'scaleCanvas', type: 'number' },
+    { id: 'canvasWidth', setting: 'canvasWidth', type: 'number' },
+    { id: 'canvasHeight', setting: 'canvasHeight', type: 'number' },
+    { id: 'diagramTitle', setting: 'title', type: 'text' },
+    { id: 'titleFontSize', setting: 'titleFontSize', type: 'number' },
+    { id: 'titlePositionX', setting: 'titlePositionX', type: 'number' },
+    { id: 'titlePositionY', setting: 'titlePositionY', type: 'number' },
+    { id: 'titleColor', setting: 'titleColor', type: 'text' },
+    { id: 'backgroundColor', setting: 'backgroundColor', type: 'text' },
+    { id: 'globalFlowOpacity', setting: 'globalFlowOpacity', type: 'number' },
+    { id: 'nodeWidth', setting: 'nodeWidth', type: 'number' },
+    { id: 'nodePadding', setting: 'nodePadding', type: 'number' },
+    { id: 'nodeColor', setting: 'nodeColor', type: 'text' },
+    { id: 'labelFontSize', setting: 'labelFontSize', type: 'number' },
+    { id: 'labelFillColor', setting: 'labelFillColor', type: 'text' },
+    { id: 'labelTextColor', setting: 'labelTextColor', type: 'text' },
+    { id: 'labelBold', setting: 'labelBold', type: 'boolean' },
+    { id: 'labelItalic', setting: 'labelItalic', type: 'boolean' },
+    { id: 'valueFontSize', setting: 'valueFontSize', type: 'number' },
+    { id: 'valueFillColor', setting: 'valueFillColor', type: 'text' },
+    { id: 'valueBold', setting: 'valueBold', type: 'boolean' },
+    { id: 'valueItalic', setting: 'valueItalic', type: 'boolean' },
+    { id: 'showValueLabelsToggle', setting: 'showValueLabels', type: 'boolean' },
+    { id: 'transparentBackgroundToggle', setting: 'transparentBackground', type: 'boolean' },
+    { id: 'enableMouseInteractions', setting: 'enableMouseInteractions', type: 'boolean' },
+    { id: 'unitSetting', setting: 'unit', type: 'text' },
+    { id: 'decimalsRoundValues', setting: 'decimalsRoundValues', type: 'number' }
+  ];
+
+  controlPanelInputs.forEach(input => {
+    const element = document.getElementById(input.id);
+    let value;
+    let hasValue = false;
+
+    if (input.type === 'boolean') {
+      // Handle checkbox inputs
+      if (element) {
+        value = element.checked ? 'Yes' : 'No';
+        hasValue = true;
+      }
+    } else if (element && element.value !== '') {
+      // Handle text and number inputs
+      value = element.value;
+      if (input.type === 'number') {
+        value = parseFloat(value);
+        if (isNaN(value)) return;
+      }
+      hasValue = true;
+    }
+
+    if (hasValue) {
+      // Check if setting already exists in updatedSettings
+      const existingSetting = updatedSettings.find(s => s.setting === input.setting);
+      if (existingSetting) {
+        existingSetting.waarde = value;
+      } else {
+        updatedSettings.push({
+          setting: input.setting,
+          waarde: value
+        });
+      }
+    }
+  });
+
+  // Create the JSON data structure
+  const jsonData = {
+    version: '1.0',
+    exportDate: new Date().toISOString(),
+    nodes: updatedNodes,
+    links: currentLinks,
+    carriers: currentCarriers,
+    settings: updatedSettings,
+    remarks: currentRemarks
+  };
+
+  // Convert to JSON string with formatting
+  const jsonString = JSON.stringify(jsonData, null, 2);
+
+  // Create a blob and download
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  
+  // Generate filename with timestamp
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  a.download = `flux_diagram_${timestamp}.json`;
+  
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  // console.log('JSON export completed successfully');
+  
+  // Update button text temporarily
+  const exportButton = document.getElementById('exportJsonButton');
+  if (exportButton) {
+    const originalText = exportButton.innerHTML;
+    exportButton.innerHTML = 'Exported ✓';
+    setTimeout(() => {
+      exportButton.innerHTML = originalText;
+    }, 2000);
+  }
+}
+
+// JSON Import Function
+function importJSONFile() {
+  // console.log('=== JSON IMPORT STARTED ===');
+  
+  // Create file input element
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+      try {
+        // console.log('File read successfully, parsing JSON data...');
+        
+        // Parse JSON data
+        const jsonData = JSON.parse(event.target.result);
+        
+        // console.log('JSON data parsed successfully:', jsonData);
+        
+        // Validate required data
+        if (!jsonData.nodes || !jsonData.links || !jsonData.carriers || !jsonData.settings) {
+          throw new Error('Missing required data in JSON file. Required: nodes, links, carriers, settings');
+        }
+        
+        // console.log('Settings format in JSON:', jsonData.settings);
+        
+        // Transform settings to expected internal format
+        // JSON format: [{setting: key1, waarde: value1}, {setting: key2, waarde: value2}, ...]
+        // Internal format: [{key1: value1, key2: value2, ...}]
+        let transformedSettings;
+        if (Array.isArray(jsonData.settings) && jsonData.settings.length > 0) {
+          // Check if settings are in the array-of-objects format
+          if (jsonData.settings[0].setting !== undefined) {
+            // Settings are in [{setting, waarde}] format - transform them
+            // transformData returns [output], so it's already an array
+            transformedSettings = transformData(jsonData.settings);
+            // console.log('Transformed settings from array format:', transformedSettings);
+          } else {
+            // Settings are already in transformed format - wrap in array if needed
+            transformedSettings = Array.isArray(jsonData.settings) ? jsonData.settings : [jsonData.settings];
+            // console.log('Settings already in transformed format:', transformedSettings);
+          }
+        } else {
+          throw new Error('Invalid settings format in JSON file');
+        }
+        
+        // Store the data globally
+        window.nodesGlobal = jsonData.nodes;
+        window.links = jsonData.links;
+        window.carriers = jsonData.carriers;
+        window.legend = jsonData.carriers; // Keep both for compatibility
+        window.settings = transformedSettings; // transformData already returns an array
+        window.remarks = jsonData.remarks || [];
+        
+        // Store original data for export purposes (keep in original array format)
+        window.originalExcelData = {
+          nodes: JSON.parse(JSON.stringify(jsonData.nodes)),
+          links: JSON.parse(JSON.stringify(jsonData.links)),
+          carriers: JSON.parse(JSON.stringify(jsonData.carriers)),
+          settings: JSON.parse(JSON.stringify(jsonData.settings)),
+          remarks: JSON.parse(JSON.stringify(jsonData.remarks || []))
+        };
+        
+        // Store original links data for scale adjustments
+        window.originalLinksData = JSON.parse(JSON.stringify(jsonData.links));
+        
+        // Create config object
+        const config = {
+          sankeyInstanceID: 'energyflows',
+          targetDIV: 'SVGContainer_energyflows',
+          settings: window.settings,
+          carriers: jsonData.carriers,
+          legend: jsonData.carriers,
+          scenarios: []
+        };
+        
+        window.currentSankeyConfig = config;
+        
+        // console.log('Data loaded successfully. Processing...');
+        // console.log('Links sample:', jsonData.links[0]);
+        // console.log('Nodes sample:', jsonData.nodes[0]);
+        // console.log('Settings:', window.settings);
+        // console.log('Config:', config);
+        
+        // Clear the existing SVG content before importing new data
+        const existingSvg = document.querySelector('#energyflows_sankeySVGPARENT');
+        if (existingSvg) {
+          // console.log('Clearing existing SVG content...');
+          existingSvg.innerHTML = '';
+        }
+        
+        // Clear the container to force a fresh render
+        const container = document.getElementById('SVGContainer_energyflows');
+        if (container) {
+          // console.log('Clearing container...');
+          container.innerHTML = '';
+        }
+        
+        // Process the data to render the diagram
+        // Check for both global processData and window.processData
+        const processFunc = typeof window.processData === 'function' ? window.processData : 
+                           typeof processData === 'function' ? processData : null;
+        
+        if (processFunc) {
+          // console.log('Calling processData...');
+          
+          try {
+            processFunc(jsonData.links, jsonData.nodes, jsonData.carriers, window.settings, jsonData.remarks, config);
+            // console.log('processData completed without errors');
+            
+            // Wait a bit for D3 to render the diagram, then check
+            setTimeout(() => {
+              // Check if sankeyDataObject was created
+              if (window.sankeyDataObject) {
+                // console.log('sankeyDataObject exists:', window.sankeyDataObject);
+                // console.log('sankeyDataObject.nodes:', window.sankeyDataObject.nodes?.length);
+                // console.log('sankeyDataObject.links:', window.sankeyDataObject.links?.length);
+              } else {
+                console.warn('sankeyDataObject was not created! (This is OK if the diagram renders)');
+              }
+              
+              // Check if the SVG was created
+              const svg = document.querySelector('#energyflows_sankeySVGPARENT');
+              if (svg) {
+                // console.log('SVG element found after delay:', svg);
+                // console.log('SVG has children:', svg.children.length);
+                
+                // Check for actual diagram content
+                const links = svg.querySelectorAll('.link');
+                const nodes = svg.querySelectorAll('.node');
+                // console.log('Links rendered:', links.length);
+                // console.log('Nodes rendered:', nodes.length);
+                
+                if (links.length === 0 && nodes.length === 0) {
+                  console.error('SVG exists but has no links or nodes! Diagram did not render properly.');
+                  console.error('SVG innerHTML length:', svg.innerHTML.length);
+                  console.error('First 500 chars of SVG:', svg.innerHTML.substring(0, 500));
+                } else {
+                  // console.log('✓ Diagram rendered successfully!');
+                }
+              } else {
+                console.warn('SVG element not found after delay!');
+              }
+              
+              // Scroll to top to ensure diagram is visible
+              window.scrollTo(0, 0);
+            }, 1000); // Wait 1 second for rendering
+            
+          } catch (processError) {
+            console.error('Error in processData:', processError);
+            throw processError;
+          }
+          
+          // Update control panel with loaded settings
+          setTimeout(() => {
+            // console.log('Updating control panel with settings:', transformedSettings[0]);
+            // transformedSettings is an array, pass the first element
+            updateControlPanelFromSettings(transformedSettings[0]);
+            // console.log('Generating legend color controls...');
+            generateLegendColorControls();
+            
+            // Check node balance after import
+            if (typeof window.checkNodeBalance === 'function') {
+              window.checkNodeBalance();
+            }
+            // console.log('Control panel update complete');
+          }, 500);
+          
+          // console.log('JSON import completed successfully');
+          // alert('JSON file imported successfully!');
+        } else {
+          console.error('processData function not available');
+          console.error('window.processData:', typeof window.processData);
+          console.error('processData:', typeof processData);
+          throw new Error('processData function not available. Make sure drawSankey.js is loaded.');
+        }
+        
+      } catch (error) {
+        console.error('Error importing JSON file:', error);
+        alert('Failed to import JSON file: ' + error.message);
+      }
+    };
+    
+    reader.onerror = function(error) {
+      console.error('Error reading file:', error);
+      alert('Failed to read JSON file');
+    };
+    
+    reader.readAsText(file);
+  };
+  
+  // Trigger file selection
+  input.click();
+}
+
+// ========================================
+// YAML EXPORT/IMPORT FUNCTIONS
+// ========================================
+
+// YAML Export Function
+function exportToYAML() {
+  // console.log('=== YAML EXPORT STARTED ===');
+  
+  try {
+    // Get current data with all modifications
+    const currentNodes = window.nodesGlobal || (sankeyDataObject && sankeyDataObject.nodes ? sankeyDataObject.nodes : []);
+    const rawLinks = window.links || window.originalLinksData;
+    
+    if (!currentNodes || !rawLinks) {
+      alert('No data available to export');
+      return;
+    }
+    
+    // Map nodes to include all relevant properties
+    const updatedNodes = currentNodes.map(node => ({
+      id: node.id,
+      title: node.title,
+      x: node.x,
+      y: node.y,
+      direction: node.direction,
+      labelposition: node.labelposition
+    }));
+    
+    // Transform settings from internal format back to Excel format
+    const settingsArray = [];
+    if (window.settings && window.settings[0]) {
+      const settingsObj = window.settings[0];
+      
+      // Get values from control panel inputs to ensure we have the latest
+      const controlInputs = [
+        { id: 'scaleDataValue', setting: 'scaleDataValue', type: 'number' },
+        { id: 'scaleHeight', setting: 'scaleHeight', type: 'number' },
+        { id: 'scaleCanvas', setting: 'scaleCanvas', type: 'number' },
+        { id: 'canvasWidth', setting: 'canvasWidth', type: 'number' },
+        { id: 'canvasHeight', setting: 'canvasHeight', type: 'number' },
+        { id: 'diagramTitle', setting: 'title', type: 'text' },
+        { id: 'titleFontSize', setting: 'titleFontSize', type: 'number' },
+        { id: 'titlePositionX', setting: 'titlePositionX', type: 'number' },
+        { id: 'titlePositionY', setting: 'titlePositionY', type: 'number' },
+        { id: 'titleColor', setting: 'titleColor', type: 'text' },
+        { id: 'backgroundColor', setting: 'backgroundColor', type: 'text' },
+        { id: 'globalFlowOpacity', setting: 'globalFlowOpacity', type: 'number' },
+        { id: 'nodeWidth', setting: 'nodeWidth', type: 'number' },
+        { id: 'nodePadding', setting: 'nodePadding', type: 'number' },
+        { id: 'nodeColor', setting: 'nodeColor', type: 'text' },
+        { id: 'labelFontSize', setting: 'labelFontSize', type: 'number' },
+        { id: 'labelFillColor', setting: 'labelFillColor', type: 'text' },
+        { id: 'labelTextColor', setting: 'labelTextColor', type: 'text' },
+        { id: 'labelBold', setting: 'labelBold', type: 'boolean' },
+        { id: 'labelItalic', setting: 'labelItalic', type: 'boolean' },
+        { id: 'valueFontSize', setting: 'valueFontSize', type: 'number' },
+        { id: 'valueFillColor', setting: 'valueFillColor', type: 'text' },
+        { id: 'valueBold', setting: 'valueBold', type: 'boolean' },
+        { id: 'valueItalic', setting: 'valueItalic', type: 'boolean' },
+        { id: 'showValueLabelsToggle', setting: 'showValueLabels', type: 'boolean' },
+        { id: 'transparentBackgroundToggle', setting: 'transparentBackground', type: 'boolean' },
+        { id: 'enableMouseInteractions', setting: 'enableMouseInteractions', type: 'boolean' },
+        { id: 'unitSetting', setting: 'unit', type: 'text' },
+        { id: 'decimalsRoundValues', setting: 'decimalsRoundValues', type: 'number' }
+      ];
+      
+      // Build settings array
+      controlInputs.forEach(input => {
+        const element = document.getElementById(input.id);
+        if (element) {
+          let value = input.type === 'boolean' ? element.checked : element.value;
+          // Convert string numbers to actual numbers for non-color, non-text fields
+          if (input.type === 'number' && !isNaN(value) && value !== '') {
+            value = parseFloat(value);
+          }
+          settingsArray.push({
+            setting: input.setting,
+            waarde: value
+          });
+        } else if (settingsObj[input.setting] !== undefined) {
+          settingsArray.push({
+            setting: input.setting,
+            waarde: settingsObj[input.setting]
+          });
+        }
+      });
+    }
+    
+    // Prepare export data
+    const exportData = {
+      version: '1.0',
+      exportDate: new Date().toISOString(),
+      nodes: updatedNodes,
+      links: rawLinks,
+      carriers: window.carriers || window.legend || [],
+      settings: settingsArray,
+      remarks: window.remarks || []
+    };
+    
+    // Convert to YAML
+    const yamlString = jsyaml.dump(exportData, {
+      indent: 2,
+      lineWidth: -1, // Don't wrap lines
+      noRefs: true   // Don't use references
+    });
+    
+    // Create and download file
+    const blob = new Blob([yamlString], { type: 'text/yaml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `diagram_${new Date().toISOString().split('T')[0]}.yaml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // console.log('YAML export completed successfully');
+    
+  } catch (error) {
+    console.error('Error exporting to YAML:', error);
+    alert('Failed to export YAML file: ' + error.message);
+  }
+}
+
+// YAML Import Function
+function importYAMLFile() {
+  // console.log('=== YAML IMPORT STARTED ===');
+  
+  // Create file input element
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.yaml,.yml';
+  
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+      try {
+        // console.log('File read successfully, parsing YAML data...');
+        
+        // Parse YAML
+        const data = jsyaml.load(event.target.result);
+        // console.log('YAML data parsed successfully:', data);
+        
+        if (!data.nodes || !data.links || !data.carriers) {
+          throw new Error('Invalid YAML file: missing required data (nodes, links, or carriers)');
+        }
+        
+        // Transform settings if needed
+        let transformedSettings;
+        // console.log('Settings format in YAML:', data.settings);
+        
+        if (Array.isArray(data.settings) && data.settings.length > 0 && data.settings[0].setting) {
+          // Settings are in [{setting: key, waarde: value}] format, need to transform
+          // console.log('Detected array format settings, transforming...');
+          transformedSettings = transformData(data.settings);
+          // console.log('Transformed settings from array format:', transformedSettings);
+        } else if (Array.isArray(data.settings) && data.settings.length > 0) {
+          // Settings are already in [{key: value}] format
+          transformedSettings = data.settings;
+        } else {
+          // No settings or invalid format
+          transformedSettings = [{}];
+        }
+        
+        // Store in global variables
+        window.nodesGlobal = data.nodes;
+        window.links = data.links;
+        window.carriers = data.carriers;
+        window.legend = data.carriers; // Keep both for compatibility
+        window.settings = transformedSettings;
+        window.remarks = data.remarks || [];
+        
+        // Store original data
+        window.originalExcelData = {
+          nodes: JSON.parse(JSON.stringify(data.nodes)),
+          links: JSON.parse(JSON.stringify(data.links)),
+          carriers: JSON.parse(JSON.stringify(data.carriers)),
+          settings: JSON.parse(JSON.stringify(transformedSettings)),
+          remarks: JSON.parse(JSON.stringify(data.remarks || []))
+        };
+        
+        // Store original links separately for reset functionality
+        window.originalLinksData = JSON.parse(JSON.stringify(data.links));
+        
+        // Create config object
+        window.currentSankeyConfig = {
+          sankeyInstanceID: 'energyflows',
+          targetDIV: 'SVGContainer_energyflows',
+          settings: transformedSettings,
+          carriers: data.carriers,
+          legend: data.carriers,
+          remarks: data.remarks || []
+        };
+        
+        // console.log('Data loaded successfully. Processing...');
+        // console.log('Links sample:', data.links[0]);
+        // console.log('Nodes sample:', data.nodes[0]);
+        // console.log('Settings:', transformedSettings);
+        // console.log('Config:', window.currentSankeyConfig);
+        
+        // Clear existing SVG content
+        // console.log('Clearing existing SVG content...');
+        const existingSVG = document.getElementById('energyflows_sankeySVGPARENT');
+        if (existingSVG) {
+          existingSVG.innerHTML = '';
+          existingSVG.remove();
+        }
+        
+        // // Clear the container
+        // console.log('Clearing container...');
+        const container = document.getElementById('SVGContainer_energyflows');
+        if (container) {
+          container.innerHTML = '';
+        }
+        
+        // Call processData to render the diagram
+        // console.log('Calling processData...');
+        if (window.processData || typeof processData !== 'undefined') {
+          const processFn = window.processData || processData;
+          processFn(data.links, data.nodes, data.carriers, transformedSettings, data.remarks || [], window.currentSankeyConfig);
+          // console.log('processData completed without errors');
+          
+          // Check if sankeyDataObject was created
+          setTimeout(() => {
+            if (window.sankeyDataObject) {
+              // console.log('sankeyDataObject exists:', window.sankeyDataObject);
+              // console.log('sankeyDataObject.nodes:', window.sankeyDataObject.nodes.length);
+              // console.log('sankeyDataObject.links:', window.sankeyDataObject.links.length);
+            } else {
+              console.warn('sankeyDataObject was not created! (This is OK if the diagram renders)');
+            }
+            
+            // Check if SVG was created and populated
+            const svg = document.getElementById('energyflows_sankeySVGPARENT');
+            if (svg) {
+              // console.log('SVG element found after delay:', svg);
+              // console.log('SVG has children:', svg.children.length);
+              
+              const links = svg.querySelectorAll('.link, .links path, path.link');
+              const nodes = svg.querySelectorAll('.node, .nodes rect, rect.node');
+              // console.log('Links rendered:', links.length);
+              // console.log('Nodes rendered:', nodes.length);
+              
+              if (links.length === 0 && nodes.length === 0) {
+                console.error('SVG exists but has no links or nodes! Diagram did not render properly.');
+              } else {
+                // console.log('✓ Diagram rendered successfully!');
+              }
+              // console.log('SVG innerHTML length:', svg.innerHTML.length);
+              // console.log('First 500 chars of SVG:', svg.innerHTML.substring(0, 500));
+            } else {
+              // console.error('SVG element not found after delay!');
+            }
+          }, 1000);
+          
+          // Update control panel and legend
+          setTimeout(() => {
+            // console.log('Updating control panel with settings:', transformedSettings[0]);
+            updateControlPanelFromSettings(transformedSettings[0]);
+            // console.log('Generating legend color controls...');
+            generateLegendColorControls();
+            
+            // Check node balance after import
+            if (typeof window.checkNodeBalance === 'function') {
+              window.checkNodeBalance();
+            }
+            // console.log('Control panel update complete');
+          }, 500);
+          
+          // Scroll to top
+          window.scrollTo(0, 0);
+          
+          // console.log('YAML import completed successfully');
+          alert('YAML file imported successfully!');
+        } else {
+          console.error('processData function not available');
+          throw new Error('processData function not available. Make sure drawSankey.js is loaded.');
+        }
+        
+      } catch (error) {
+        console.error('Error importing YAML file:', error);
+        alert('Failed to import YAML file: ' + error.message);
+      }
+    };
+    
+    reader.onerror = function(error) {
+      console.error('Error reading file:', error);
+      alert('Failed to read YAML file');
+    };
+    
+    reader.readAsText(file);
+  };
+  
+  // Trigger file selection
+  input.click();
+}
+
+// Make YAML functions globally available
+window.exportToYAML = exportToYAML;
+window.importYAMLFile = importYAMLFile;
+
+// Helper function to update control panel from settings
+function updateControlPanelFromSettings(settings) {
+  if (!settings) return;
+  
+  const controlPanelInputs = [
+    { id: 'scaleDataValue', setting: 'scaleDataValue', type: 'number' },
+    { id: 'scaleHeight', setting: 'scaleHeight', type: 'number' },
+    { id: 'scaleCanvas', setting: 'scaleCanvas', type: 'number' },
+    { id: 'canvasWidth', setting: 'canvasWidth', type: 'number' },
+    { id: 'canvasHeight', setting: 'canvasHeight', type: 'number' },
+    { id: 'diagramTitle', setting: 'title', type: 'text' },
+    { id: 'titleFontSize', setting: 'titleFontSize', type: 'number' },
+    { id: 'titlePositionX', setting: 'titlePositionX', type: 'number' },
+    { id: 'titlePositionY', setting: 'titlePositionY', type: 'number' },
+    { id: 'titleColor', setting: 'titleColor', type: 'text' },
+    { id: 'backgroundColor', setting: 'backgroundColor', type: 'text' },
+    { id: 'nodeWidth', setting: 'nodeWidth', type: 'number' },
+    { id: 'nodeColor', setting: 'nodeColor', type: 'text' },
+    { id: 'labelFillColor', setting: 'labelFillColor', type: 'text' },
+    { id: 'labelTextColor', setting: 'labelTextColor', type: 'text' },
+    { id: 'showValueLabelsToggle', setting: 'showValueLabels', type: 'boolean' },
+    { id: 'transparentBackgroundToggle', setting: 'transparentBackground', type: 'boolean' },
+    { id: 'unitSetting', setting: 'unit', type: 'text' },
+    { id: 'decimalsRoundValues', setting: 'decimalsRoundValues', type: 'number' },
+    { id: 'globalFlowOpacity', setting: 'globalFlowOpacity', type: 'number' },
+    { id: 'nodePadding', setting: 'nodePadding', type: 'number' },
+    { id: 'labelFontSize', setting: 'labelFontSize', type: 'number' },
+    { id: 'labelBold', setting: 'labelBold', type: 'boolean' },
+    { id: 'labelItalic', setting: 'labelItalic', type: 'boolean' },
+    { id: 'valueFontSize', setting: 'valueFontSize', type: 'number' },
+    { id: 'valueFillColor', setting: 'valueFillColor', type: 'text' },
+    { id: 'valueBold', setting: 'valueBold', type: 'boolean' },
+    { id: 'valueItalic', setting: 'valueItalic', type: 'boolean' }
+  ];
+  
+  // console.log('Applying settings to control panel:', settings);
+  
+  controlPanelInputs.forEach(input => {
+    const element = document.getElementById(input.id);
+    if (!element) {
+      console.log(`Control element not found: ${input.id}`);
+      return;
+    }
+    
+    const value = settings[input.setting];
+    if (value === undefined || value === null) {
+      console.log(`No value for setting: ${input.setting}`);
+      return;
+    }
+    
+    // console.log(`Setting ${input.id} (${input.setting}) to: ${value}`);
+    
+    if (input.type === 'boolean') {
+      const boolValue = (value === 'Yes' || value === true || value === 'true');
+      element.checked = boolValue;
+      // Dispatch change event to trigger any onchange handlers
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    } else {
+      element.value = value;
+      // Dispatch input and change events to trigger any handlers
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+  
+  // console.log('Control panel settings applied');
 }
 
 // Helper function to update worksheet while preserving original structure
@@ -2991,7 +3793,7 @@ function updateTitleColor(newColor) {
     if (config && config.settings && config.settings[0]) {
       // Update the title color in the config
       config.settings[0].titleColor = newColor;
-      console.log('Updated titleColor to:', newColor);
+      // console.log('Updated titleColor to:', newColor);
 
       // Update the global settings
       if (window.settings && window.settings[0]) {
@@ -3782,7 +4584,7 @@ function updatecanvasHeight(newCanvasHeight) {
       return;
     }
 
-    console.log('Updating scroll extent height to:', newCanvasHeight);
+    // console.log('Updating scroll extent height to:', newCanvasHeight);
 
     // Try to access the config
     let config = window.currentSankeyConfig;
@@ -4540,9 +5342,9 @@ function populateLegendSelect(selectId) {
 
 // Link editing functions (make globally available)
 window.editLink = function editLink(linkData, linkElement) {
-  console.log('=== EDIT LINK FUNCTION CALLED ===');
-  console.log('Full linkData object:', linkData);
-  console.log('linkData.legend:', linkData.legend);
+  // console.log('=== EDIT LINK FUNCTION CALLED ===');
+  // console.log('Full linkData object:', linkData);
+  // console.log('linkData.legend:', linkData.legend);
   currentEditingLink = { data: linkData, element: linkElement };
   
   // Extract source and target IDs (they might be objects or strings)
@@ -4587,13 +5389,13 @@ window.editLink = function editLink(linkData, linkElement) {
   const legendSelect = document.getElementById('linkLegendSelect');
   // Check for both 'carrier' (new) and 'legend' (old) properties
   const carrierValue = linkData.carrier || linkData.legend;
-  console.log('Setting carrier value from linkData.carrier or linkData.legend:', carrierValue);
-  console.log('linkData.carrier:', linkData.carrier, '| linkData.legend:', linkData.legend);
-  console.log('Available carrier options:', Array.from(legendSelect.options).map(o => o.value));
+  // console.log('Setting carrier value from linkData.carrier or linkData.legend:', carrierValue);
+  // console.log('linkData.carrier:', linkData.carrier, '| linkData.legend:', linkData.legend);
+  // console.log('Available carrier options:', Array.from(legendSelect.options).map(o => o.value));
   
   if (carrierValue) {
     legendSelect.value = carrierValue;
-    console.log('After setting, legendSelect.value is:', legendSelect.value);
+    // console.log('After setting, legendSelect.value is:', legendSelect.value);
     // If value didn't set (option doesn't exist), log warning
     if (legendSelect.value !== carrierValue) {
       console.warn('Carrier type not found in options:', carrierValue);
@@ -5239,7 +6041,7 @@ window.saveNewFlow = function saveNewFlow() {
   // Add to links array
   if (!window.links) window.links = [];
   window.links.push(newLink);
-  console.log('Added to window.links. Total links:', window.links.length);
+  // console.log('Added to window.links. Total links:', window.links.length);
   
   // Also add to sankeyDataObject if it exists
   if (window.sankeyDataObject) {
@@ -5469,7 +6271,7 @@ window.debugAttachEventListeners = function debugAttachEventListeners() {
         linkPath.style.pointerEvents = 'all';
         
         linkPath.addEventListener('click', function(event) {
-          console.log('=== LINK CLICK ===', event);
+          // console.log('=== LINK CLICK ===', event);
           event.stopPropagation();
           
           // Try to get D3 data
@@ -5495,7 +6297,7 @@ window.debugAttachEventListeners = function debugAttachEventListeners() {
         node.style.cursor = 'pointer';
         
         node.addEventListener('click', function(event) {
-          console.log('=== NODE CLICK ===', event);
+          // console.log('=== NODE CLICK ===', event);
           
           if (event.shiftKey) {
             event.stopPropagation();
@@ -5804,11 +6606,11 @@ window.testPurgeUnusedNodes = function() {
   // Find unused nodes
   const unusedNodes = window.nodesGlobal.filter(node => !usedNodeIds.has(node.id));
   
-  console.log('=== PURGE UNUSED NODES TEST RESULTS ===');
-  console.log('Total nodes:', window.nodesGlobal.length);
-  console.log('Total links:', window.links.length);
-  console.log('Used node IDs:', Array.from(usedNodeIds).sort());
-  console.log('Unused nodes found:', unusedNodes.length);
+  // console.log('=== PURGE UNUSED NODES TEST RESULTS ===');
+  // console.log('Total nodes:', window.nodesGlobal.length);
+  // console.log('Total links:', window.links.length);
+  // console.log('Used node IDs:', Array.from(usedNodeIds).sort());
+  // console.log('Unused nodes found:', unusedNodes.length);
   
   if (unusedNodes.length > 0) {
     console.log('Unused nodes details:');
@@ -6006,7 +6808,7 @@ function updateUnit(newUnit) {
     // Refresh the diagram to apply new unit to labels
     setTimeout(() => {
       if (typeof refreshDiagram === 'function') {
-        console.log('Refreshing diagram to apply new unit');
+        // console.log('Refreshing diagram to apply new unit');
         refreshDiagram();
       } else {
         // Fallback: update existing labels directly
@@ -6210,9 +7012,9 @@ window.verifyLegendExportData = function verifyLegendExportData() {
     return { legendCount: 0, legendItems: [] };
   }
   
-  console.log('Legend items that WILL be included in Excel export:');
+  // console.log('Legend items that WILL be included in Excel export:');
   exportLegendData.forEach((item, index) => {
-    console.log(`  ${index + 1}. ID: "${item.id}", Name: "${item.name}", Color: "${item.color}"`);
+    // console.log(`  ${index + 1}. ID: "${item.id}", Name: "${item.name}", Color: "${item.color}"`);
   });
   
   // console.log('Total legend items for export:', exportLegendData.length);
@@ -6241,7 +7043,7 @@ window.verifyLegendExportData = function verifyLegendExportData() {
   }
   
   if (unusedInExport.length === 0 && missingInExport.length === 0) {
-    console.log('✅ Export legend data is perfectly synchronized with link usage');
+    // console.log('✅ Export legend data is perfectly synchronized with link usage');
   }
   
   return {
@@ -6443,9 +7245,9 @@ function toggleSection(headerElement) {
   }
 }
 
-// Drag and Drop functionality for Excel files
+// Drag and Drop functionality for Excel, YAML, and JSON files
 function setupDragAndDrop() {
-  // console.log('Setting up drag and drop functionality...');
+  // console.log('Setting up drag and drop functionality for Excel, YAML, and JSON files...');
   
   // Check if handleExcelImport is available
   if (typeof window.handleExcelImport === 'function') {
@@ -6508,37 +7310,210 @@ function setupDragAndDrop() {
     const file = files[0]; // Take the first file
     // console.log('Dropped file:', file.name, 'Type:', file.type, 'Size:', file.size);
     
-    // Validate file type
-    const validExtensions = ['.xlsx', '.xls'];
+    // Validate file type and determine handler
     const fileName = file.name.toLowerCase();
-    const isValidExcel = validExtensions.some(ext => fileName.endsWith(ext));
+    const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+    const isYAML = fileName.endsWith('.yaml') || fileName.endsWith('.yml');
+    const isJSON = fileName.endsWith('.json');
     
-    if (!isValidExcel) {
-      alert('Please drop a valid Excel file (.xlsx or .xls)');
+    if (!isExcel && !isYAML && !isJSON) {
+      alert('Please drop a valid file (.xlsx, .xls, .yaml, .yml, or .json)');
       return;
     }
     
-    // Create a fake event object that mimics the file input change event
-    const fakeEvent = {
-      target: {
-        files: [file]
+    // Handle based on file type
+    if (isExcel) {
+      // Handle Excel file
+      const fakeEvent = {
+        target: {
+          files: [file]
+        }
+      };
+      
+      // console.log('Processing dropped Excel file...');
+      
+      if (typeof window.handleExcelImport === 'function') {
+        try {
+          window.handleExcelImport(fakeEvent, true); // Pass true for isDragDrop
+          // console.log('Excel file imported successfully via drag-and-drop');
+        } catch (error) {
+          console.error('Error calling handleExcelImport:', error);
+          alert('Error processing the dropped Excel file: ' + error.message);
+        }
+      } else {
+        console.error('handleExcelImport function is not available');
+        alert('Excel import functionality is not available');
+      }
+    } else if (isYAML) {
+      // Handle YAML file
+      // console.log('Processing dropped YAML file...');
+      handleYAMLDrop(file);
+    } else if (isJSON) {
+      // Handle JSON file
+      // console.log('Processing dropped JSON file...');
+      handleJSONDrop(file);
+    }
+  }
+  
+  // Handler for dropped YAML files
+  function handleYAMLDrop(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+      try {
+        // console.log('YAML file read successfully, parsing...');
+        
+        // Parse YAML
+        const data = jsyaml.load(event.target.result);
+        // console.log('YAML data parsed successfully:', data);
+        
+        if (!data.nodes || !data.links || !data.carriers) {
+          throw new Error('Invalid YAML file: missing required data (nodes, links, or carriers)');
+        }
+        
+        // Call the same processing logic as importYAMLFile
+        processImportedData(data, 'YAML');
+        
+      } catch (error) {
+        console.error('Error importing YAML file:', error);
+        alert('Failed to import YAML file: ' + error.message);
       }
     };
     
-    // console.log('Processing dropped Excel file with handleExcelImport...');
+    reader.onerror = function(error) {
+      console.error('Error reading YAML file:', error);
+      alert('Failed to read YAML file');
+    };
     
-    // Check if function is available before calling
-    if (typeof window.handleExcelImport === 'function') {
+    reader.readAsText(file);
+  }
+  
+  // Handler for dropped JSON files
+  function handleJSONDrop(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
       try {
-        window.handleExcelImport(fakeEvent, true); // Pass true for isDragDrop
-        // console.log('handleExcelImport called successfully for drag-and-drop');
+        // console.log('JSON file read successfully, parsing...');
+        
+        // Parse JSON
+        const data = JSON.parse(event.target.result);
+        // console.log('JSON data parsed successfully:', data);
+        
+        if (!data.nodes || !data.links || !data.carriers) {
+          throw new Error('Invalid JSON file: missing required data (nodes, links, or carriers)');
+        }
+        
+        // Call the same processing logic as importJSONFile
+        processImportedData(data, 'JSON');
+        
       } catch (error) {
-        console.error('Error calling handleExcelImport:', error);
-        alert('Error processing the dropped file: ' + error.message);
+        // console.error('Error importing JSON file:', error);
+        alert('Failed to import JSON file: ' + error.message);
       }
+    };
+    
+    reader.onerror = function(error) {
+      // console.error('Error reading JSON file:', error);
+      alert('Failed to read JSON file');
+    };
+    
+    reader.readAsText(file);
+  }
+  
+  // Shared function to process imported data (used by both YAML and JSON drag-drop)
+  function processImportedData(data, format) {
+    // Transform settings if needed
+    let transformedSettings;
+    // console.log(`Settings format in ${format}:`, data.settings);
+    
+    if (Array.isArray(data.settings) && data.settings.length > 0 && data.settings[0].setting) {
+      // Settings are in [{setting: key, waarde: value}] format, need to transform
+      // console.log('Detected array format settings, transforming...');
+      transformedSettings = transformData(data.settings);
+      // console.log('Transformed settings from array format:', transformedSettings);
+    } else if (Array.isArray(data.settings) && data.settings.length > 0) {
+      // Settings are already in [{key: value}] format
+      transformedSettings = data.settings;
     } else {
-      console.error('handleExcelImport function is not available');
-      alert('File import functionality is not available');
+      // No settings or invalid format
+      transformedSettings = [{}];
+    }
+    
+    // Store in global variables
+    window.nodesGlobal = data.nodes;
+    window.links = data.links;
+    window.carriers = data.carriers;
+    window.legend = data.carriers; // Keep both for compatibility
+    window.settings = transformedSettings;
+    window.remarks = data.remarks || [];
+    
+    // Store original data
+    window.originalExcelData = {
+      nodes: JSON.parse(JSON.stringify(data.nodes)),
+      links: JSON.parse(JSON.stringify(data.links)),
+      carriers: JSON.parse(JSON.stringify(data.carriers)),
+      settings: JSON.parse(JSON.stringify(transformedSettings)),
+      remarks: JSON.parse(JSON.stringify(data.remarks || []))
+    };
+    
+    // Store original links separately for reset functionality
+    window.originalLinksData = JSON.parse(JSON.stringify(data.links));
+    
+    // Create config object
+    window.currentSankeyConfig = {
+      sankeyInstanceID: 'energyflows',
+      targetDIV: 'SVGContainer_energyflows',
+      settings: transformedSettings,
+      carriers: data.carriers,
+      legend: data.carriers,
+      remarks: data.remarks || []
+    };
+    
+    // console.log('Data loaded successfully. Processing...');
+    
+    // Clear existing SVG content
+    const existingSVG = document.getElementById('energyflows_sankeySVGPARENT');
+    if (existingSVG) {
+      existingSVG.innerHTML = '';
+      existingSVG.remove();
+    }
+    
+    // Clear the container
+    const container = document.getElementById('SVGContainer_energyflows');
+    if (container) {
+      container.innerHTML = '';
+    }
+    
+    // Call processData to render the diagram
+    // console.log('Calling processData...');
+    if (window.processData || typeof processData !== 'undefined') {
+      const processFn = window.processData || processData;
+      processFn(data.links, data.nodes, data.carriers, transformedSettings, data.remarks || [], window.currentSankeyConfig);
+      // console.log('processData completed without errors');
+      
+      // Update control panel and legend
+      setTimeout(() => {
+        // console.log('Updating control panel with settings:', transformedSettings[0]);
+        updateControlPanelFromSettings(transformedSettings[0]);
+        // console.log('Generating legend color controls...');
+        generateLegendColorControls();
+        
+        // Check node balance after import
+        if (typeof window.checkNodeBalance === 'function') {
+          window.checkNodeBalance();
+        }
+        // console.log('Control panel update complete');
+      }, 500);
+      
+      // Scroll to top
+      window.scrollTo(0, 0);
+      
+      // console.log(`${format} import via drag-and-drop completed successfully`);
+      // alert(`${format} file imported successfully!`);
+    } else {
+      console.error('processData function not available');
+      throw new Error('processData function not available. Make sure drawSankey.js is loaded.');
     }
   }
 }
@@ -6549,6 +7524,9 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => {
     setupDragAndDrop();
     window.dragDropInitialized = true;
+    
+    // Initialize export format from localStorage
+    initializeExportFormat();
   }, 100);
 });
 
