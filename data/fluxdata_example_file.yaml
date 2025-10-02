@@ -1,0 +1,588 @@
+version: '1.0'
+exportDate: '2025-10-02T09:59:43.738Z'
+nodes:
+  - id: rijksbegroting
+    title: Rijksbegroting
+    x: 840
+    'y': 300
+    direction: right
+    labelposition: right
+  - id: indirecte_belastingen
+    title: Indirecte belastingen
+    x: 600
+    'y': 420
+    direction: right
+    labelposition: right
+  - id: directe_belastingen
+    title: Directe belastingen
+    x: 600
+    'y': 140
+    direction: right
+    labelposition: right
+  - id: zorgverzekeringswet
+    title: Zorgverzekeringswet
+    x: 400
+    'y': 760
+    direction: right
+    labelposition: left
+  - id: premies_volksverzekeringen
+    title: Premies volksverzekeringen
+    x: 400
+    'y': 840
+    direction: right
+    labelposition: left
+  - id: premies_werknemersverzekeringen
+    title: Premies werknemersverzekeringen
+    x: 400
+    'y': 800
+    direction: right
+    labelposition: left
+  - id: uit_sociale_zekerheid
+    title: Sociale zekerheid
+    x: 1180
+    'y': 80
+    direction: right
+    labelposition: right
+  - id: uit_zorg
+    title: Zorg
+    x: 1180
+    'y': 140
+    direction: right
+    labelposition: right
+  - id: uit_defensie
+    title: Defensie
+    x: 1180
+    'y': 320
+    direction: right
+    labelposition: right
+  - id: gemeentefonds_en_provinciefonds
+    title: Gemeentefonds en Provinciefonds
+    x: 1180
+    'y': 260
+    direction: right
+    labelposition: right
+  - id: onderwijs_cultuur_en_wetenschap
+    title: Onderwijs, Cultuur en Wetenschap
+    x: 1180
+    'y': 200
+    direction: right
+    labelposition: right
+  - id: infrastructuur_en_waterstaat
+    title: Infrastructuur en Waterstaat
+    x: 1180
+    'y': 360
+    direction: right
+    labelposition: right
+  - id: buitenlandse_zaken_en_ontwikkelingshulp
+    title: Buitenlandse Zaken en Ontwikkelingshulp
+    x: 1180
+    'y': 440
+    direction: right
+    labelposition: right
+  - id: asiel_en_migratie
+    title: Asiel en Migratie
+    x: 1180
+    'y': 480
+    direction: right
+    labelposition: right
+  - id: klimaat_en_groene_groei
+    title: Klimaat en Groene Groei
+    x: 1180
+    'y': 520
+    direction: right
+    labelposition: right
+  - id: economische_zaken
+    title: Economische Zaken
+    x: 1180
+    'y': 600
+    direction: right
+    labelposition: right
+  - id: volkshuisvesting_en_ruimtelijke_ordening
+    title: Volkshuisvesting en Ruimtelijke Ordening
+    x: 1180
+    'y': 640
+    direction: right
+    labelposition: right
+  - id: financien
+    title: Financiën
+    x: 1180
+    'y': 680
+    direction: right
+    labelposition: right
+  - id: overig
+    title: Overig
+    x: 1180
+    'y': 800
+    direction: right
+    labelposition: right
+  - id: justitie_en_veiligheid
+    title: Justitie en Veiligheid
+    x: 1180
+    'y': 400
+    direction: right
+    labelposition: right
+  - id: rentelasten
+    title: Rentelasten
+    x: 1180
+    'y': 760
+    direction: right
+    labelposition: right
+  - id: landbouw_visserij_voedselzekerheid_en_natuur
+    title: Landbouw, Visserij, Voedselzekerheid en Natuur
+    x: 1180
+    'y': 560
+    direction: right
+    labelposition: right
+  - id: binnenlandse_zaken_en_koninkrijksrelaties
+    title: Binnenlandse Zaken en Koninkrijksrelaties
+    x: 1180
+    'y': 720
+    direction: right
+    labelposition: right
+  - id: begrotingstekort
+    title: Begrotingstekort
+    x: 820
+    'y': 40
+    direction: right
+    labelposition: left
+  - id: omzetbelasting_btw
+    title: Omzetbelasting (btw)
+    x: 400
+    'y': 340
+    direction: right
+    labelposition: left
+  - id: accijnzen
+    title: Accijnzen
+    x: 400
+    'y': 400
+    direction: right
+    labelposition: left
+  - id: overdrachts_en_assurantiebelasting
+    title: Overdrachts- en assurantiebelasting
+    x: 400
+    'y': 440
+    direction: right
+    labelposition: left
+  - id: belastingen_op_een_milieugrondslag
+    title: Belastingen op een milieugrondslag
+    x: 400
+    'y': 480
+    direction: right
+    labelposition: left
+  - id: motorrijtuigenbelasting
+    title: Motorrijtuigenbelasting
+    x: 400
+    'y': 560
+    direction: right
+    labelposition: left
+  - id: invoerrechten
+    title: Invoerrechten
+    x: 400
+    'y': 600
+    direction: right
+    labelposition: left
+  - id: belasting_op_personenautos_en_motorrijwielen_bpm
+    title: Belasting op personenauto's en motorrijwielen (bpm)
+    x: 400
+    'y': 640
+    direction: right
+    labelposition: left
+  - id: verbruiksbelasting
+    title: Verbruiksbelasting
+    x: 400
+    'y': 720
+    direction: right
+    labelposition: left
+  - id: bankbelasting
+    title: Bankbelasting
+    x: 400
+    'y': 520
+    direction: right
+    labelposition: left
+  - id: belasting_op_zware_motorrijtuigen
+    title: Belasting op zware motorrijtuigen
+    x: 400
+    'y': 680
+    direction: right
+    labelposition: left
+  - id: loon_en_inkomstenbelasting
+    title: Loon- en inkomstenbelasting
+    x: 400
+    'y': 80
+    direction: right
+    labelposition: left
+  - id: vennootschapsbelasting
+    title: Vennootschapsbelasting
+    x: 400
+    'y': 140
+    direction: right
+    labelposition: left
+  - id: dividendbelasting
+    title: Dividendbelasting
+    x: 400
+    'y': 260
+    direction: right
+    labelposition: left
+  - id: schenk_en_erfbelasting
+    title: Schenk- en erfbelasting
+    x: 400
+    'y': 180
+    direction: right
+    labelposition: left
+  - id: kansspelbelasting
+    title: Kansspelbelasting
+    x: 400
+    'y': 220
+    direction: right
+    labelposition: left
+  - id: overige_directe_belastingen
+    title: Overig
+    x: 400
+    'y': 300
+    direction: right
+    labelposition: left
+  - id: premies
+    title: Premies
+    x: 600
+    'y': 640
+    direction: right
+    labelposition: right
+links:
+  - source.id: indirecte_belastingen
+    target.id: rijksbegroting
+    value: 129
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: directe_belastingen
+    target.id: rijksbegroting
+    value: 173
+    carrier: directe_belasting
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: zorgverzekeringswet
+    target.id: premies
+    value: 61
+    carrier: Premies
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: premies_volksverzekeringen
+    target.id: premies
+    value: 45
+    carrier: Premies
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: premies_werknemersverzekeringen
+    target.id: premies
+    value: 45
+    carrier: Premies
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: uit_sociale_zekerheid
+    value: 124.7
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: uit_zorg
+    value: 119.5
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: uit_defensie
+    value: 35
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: gemeentefonds_en_provinciefonds
+    value: 56.6
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: onderwijs_cultuur_en_wetenschap
+    value: 54.8
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: infrastructuur_en_waterstaat
+    value: 14.9
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: buitenlandse_zaken_en_ontwikkelingshulp
+    value: 15.5
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: asiel_en_migratie
+    value: 8.9
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: klimaat_en_groene_groei
+    value: 4.1
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: economische_zaken
+    value: 2.9
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: volkshuisvesting_en_ruimtelijke_ordening
+    value: 8.8
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: financien
+    value: 3.5
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: overig
+    value: 4.2
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: justitie_en_veiligheid
+    value: 16.8
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: rentelasten
+    value: 9.5
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: landbouw_visserij_voedselzekerheid_en_natuur
+    value: 4.2
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: rijksbegroting
+    target.id: binnenlandse_zaken_en_koninkrijksrelaties
+    value: 3
+    carrier: Uitgaven
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: omzetbelasting_btw
+    target.id: indirecte_belastingen
+    value: 87.8
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: accijnzen
+    target.id: indirecte_belastingen
+    value: 11.5
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: overdrachts_en_assurantiebelasting
+    target.id: indirecte_belastingen
+    value: 9.3
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: belastingen_op_een_milieugrondslag
+    target.id: indirecte_belastingen
+    value: 6.6
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: motorrijtuigenbelasting
+    target.id: indirecte_belastingen
+    value: 5.5
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: invoerrechten
+    target.id: indirecte_belastingen
+    value: 5
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: belasting_op_personenautos_en_motorrijwielen_bpm
+    target.id: indirecte_belastingen
+    value: 1.8
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: verbruiksbelasting
+    target.id: indirecte_belastingen
+    value: 0.6
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: bankbelasting
+    target.id: indirecte_belastingen
+    value: 0.6
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: belasting_op_zware_motorrijtuigen
+    target.id: indirecte_belastingen
+    value: 0.1
+    carrier: indirecte_belastingen
+    type: 0
+    visibility: 1
+    direction: r
+    legend: indirecte_belastingen
+  - source.id: loon_en_inkomstenbelasting
+    target.id: directe_belastingen
+    value: 110
+    carrier: directe_belasting
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: vennootschapsbelasting
+    target.id: directe_belastingen
+    value: 50
+    carrier: directe_belasting
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: dividendbelasting
+    target.id: directe_belastingen
+    value: 7.7
+    carrier: directe_belasting
+    type: 0
+    visibility: 1
+    direction: r
+    legend: directe_belasting
+  - source.id: schenk_en_erfbelasting
+    target.id: directe_belastingen
+    value: 4
+    carrier: directe_belasting
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: kansspelbelasting
+    target.id: directe_belastingen
+    value: 1
+    carrier: directe_belasting
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: overige_directe_belastingen
+    target.id: directe_belastingen
+    value: 0.4
+    carrier: directe_belasting
+    type: 0
+    visibility: 1
+    direction: r
+  - source.id: premies
+    target.id: rijksbegroting
+    value: 151
+    carrier: Premies
+    type: 0
+    visibility: 1
+    direction: r
+carriers:
+  - id: Premies
+    color: '#db4c33'
+  - id: Uitgaven
+    color: '#73b0af'
+  - id: Begrotingstekort
+    color: '#696969'
+  - id: directe_belasting
+    color: '#a167da'
+  - id: indirecte_belastingen
+    color: '#3498db'
+settings:
+  - setting: scaleDataValue
+    waarde: 1
+  - setting: scaleHeight
+    waarde: 0.3
+  - setting: scaleCanvas
+    waarde: 0.8
+  - setting: canvasWidth
+    waarde: 1250
+  - setting: canvasHeight
+    waarde: 700
+  - setting: title
+    waarde: Miljoenennota 2026 (voorbeeld diagram)
+  - setting: titleFontSize
+    waarde: 20
+  - setting: titlePositionX
+    waarde: 40
+  - setting: titlePositionY
+    waarde: 45
+  - setting: titleColor
+    waarde: '#000000'
+  - setting: backgroundColor
+    waarde: '#eef5fa'
+  - setting: globalFlowOpacity
+    waarde: 0.9
+  - setting: nodeWidth
+    waarde: 4
+  - setting: nodeColor
+    waarde: '#000000'
+  - setting: labelFillColor
+    waarde: '#ffffff'
+  - setting: labelTextColor
+    waarde: '#000000'
+  - setting: showValueLabels
+    waarde: true
+  - setting: transparentBackground
+    waarde: false
+  - setting: unit
+    waarde: miljard euro
+  - setting: decimalsRoundValues
+    waarde: 1
+remarks: {}
