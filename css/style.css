@@ -2960,33 +2960,45 @@ path.link {
   box-shadow: none;
 }
 
-/* Excel buttons (Import/Export XLSX) - Muted Forest Green */
+/* Excel buttons (Import/Export XLSX) - Dark Charcoal */
 .edit-btn.excel {
-  background-color: #4a7c59;
+  background-color: #2a2a2a;
 }
 
 .edit-btn.excel:hover {
-  background-color: #5a8f6a;
+  background-color: #3a3a3a;
   transform: translateY(-1px);
 }
 
-/* Data buttons (Import/Export JSON/YAML) - Muted Steel Blue */
+/* Data buttons (Import/Export JSON/YAML) - Charcoal Gray */
 .edit-btn.data {
-  background-color: #4a6785;
+  background-color: #3d3d3d;
 }
 
 .edit-btn.data:hover {
-  background-color: #5a7a98;
+  background-color: #4d4d4d;
   transform: translateY(-1px);
 }
 
-/* Image export buttons (Export PNG/SVG) - Muted Plum */
+/* Image export buttons (Export PNG/SVG) - Medium Gray */
 .edit-btn.image {
-  background-color: #6d5b7b;
+  background-color: #505050;
 }
 
 .edit-btn.image:hover {
-  background-color: #7e6c8d;
+  background-color: #5d5d5d;
+  transform: translateY(-1px);
+}
+
+/* Manual/Help button - White with black text */
+.edit-btn.manual {
+  background-color: #ccc;
+  color: #000000;
+}
+
+.edit-btn.manual:hover {
+  background-color: #f0f0f0;
+  color: #000000;
   transform: translateY(-1px);
 }
 
