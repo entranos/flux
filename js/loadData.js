@@ -202,6 +202,59 @@ function initTool () {
         }
 
         processData(links, nodes, legend, settings, remarks, config)
+        
+        // Apply settings after diagram is rendered (similar to Excel/JSON/YAML import)
+        setTimeout(() => {
+          if (settings && settings[0]) {
+            // Apply showValueLabels setting
+            const showValueLabelsSetting = settings[0].showValueLabels || 'Yes';
+            const sankeyDiagram = document.querySelector('#energyflows_sankeySVGPARENT');
+            if (sankeyDiagram) {
+              const valueLabels = sankeyDiagram.querySelectorAll('.nodes .node .node-value');
+              const valueBackdrops = sankeyDiagram.querySelectorAll('.nodes .node .node-backdrop-value');
+              
+              valueLabels.forEach(label => {
+                const nodeElement = label.closest('.node');
+                if (nodeElement && nodeElement.__data__) {
+                  const nodeName = nodeElement.__data__.id;
+                  if (nodeName && nodeName.startsWith('.')) {
+                    label.style.display = 'none';
+                  } else {
+                    label.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none';
+                  }
+                } else {
+                  label.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none';
+                }
+              });
+              
+              valueBackdrops.forEach(backdrop => {
+                const nodeElement = backdrop.closest('.node');
+                if (nodeElement && nodeElement.__data__) {
+                  const nodeName = nodeElement.__data__.id;
+                  if (nodeName && nodeName.startsWith('.')) {
+                    backdrop.style.display = 'none';
+                  } else {
+                    backdrop.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none';
+                  }
+                } else {
+                  backdrop.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none';
+                }
+              });
+              
+              console.log(`Applied showValueLabels setting: ${showValueLabelsSetting} to ${valueLabels.length} labels`);
+            }
+            
+            // Update control panel to reflect loaded settings
+            if (typeof updateControlPanelFromSettings === 'function') {
+              updateControlPanelFromSettings(settings[0]);
+            }
+            
+            // Generate legend color controls
+            if (typeof generateLegendColorControls === 'function') {
+              generateLegendColorControls();
+            }
+          }
+        }, 600); // Apply after diagram is fully rendered
       })
     })
   } else if (dataSource == 'file') {
