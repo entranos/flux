@@ -29,7 +29,7 @@ body {
 }
 
 #main-container {
-  width: 1300px;
+  width: 100%;
   background-color: #EEF5FA;
   padding: 0;
   box-sizing: border-box;
@@ -37,14 +37,14 @@ body {
   position: relative;
 }
 
-/* Add growing sidebars */
+/* Add growing sidebars - disabled for full width */
 #main-container::before,
 #main-container::after {
   content: '';
   position: fixed;
   top: 0;
   bottom: 0;
-  width: calc((100% - 1300px) / 2);
+  width: 0;
   background-color: #CCC;
   z-index: -1;
 }
@@ -87,7 +87,7 @@ body {
 }
 
 .content-constrained {
-  width: 1300px;
+  width: 100%;
   margin: 0 auto;
   padding: 50px;
   box-sizing: border-box;

@@ -1,588 +1,626 @@
 version: '1.0'
-exportDate: '2025-10-02T09:59:43.738Z'
+exportDate: '2025-10-13T21:39:23.279524'
 nodes:
-  - id: rijksbegroting
-    title: Rijksbegroting
-    x: 840
-    'y': 300
-    direction: right
-    labelposition: right
-  - id: indirecte_belastingen
-    title: Indirecte belastingen
-    x: 600
-    'y': 420
-    direction: right
-    labelposition: right
-  - id: directe_belastingen
-    title: Directe belastingen
-    x: 600
-    'y': 140
-    direction: right
-    labelposition: right
-  - id: zorgverzekeringswet
-    title: Zorgverzekeringswet
-    x: 400
-    'y': 760
-    direction: right
-    labelposition: left
-  - id: premies_volksverzekeringen
-    title: Premies volksverzekeringen
-    x: 400
-    'y': 840
-    direction: right
-    labelposition: left
-  - id: premies_werknemersverzekeringen
-    title: Premies werknemersverzekeringen
-    x: 400
-    'y': 800
-    direction: right
-    labelposition: left
-  - id: uit_sociale_zekerheid
-    title: Sociale zekerheid
-    x: 1180
-    'y': 80
-    direction: right
-    labelposition: right
-  - id: uit_zorg
-    title: Zorg
-    x: 1180
-    'y': 140
-    direction: right
-    labelposition: right
-  - id: uit_defensie
-    title: Defensie
-    x: 1180
-    'y': 320
-    direction: right
-    labelposition: right
-  - id: gemeentefonds_en_provinciefonds
-    title: Gemeentefonds en Provinciefonds
-    x: 1180
-    'y': 260
-    direction: right
-    labelposition: right
-  - id: onderwijs_cultuur_en_wetenschap
-    title: Onderwijs, Cultuur en Wetenschap
-    x: 1180
-    'y': 200
-    direction: right
-    labelposition: right
-  - id: infrastructuur_en_waterstaat
-    title: Infrastructuur en Waterstaat
-    x: 1180
-    'y': 360
-    direction: right
-    labelposition: right
-  - id: buitenlandse_zaken_en_ontwikkelingshulp
-    title: Buitenlandse Zaken en Ontwikkelingshulp
-    x: 1180
-    'y': 440
-    direction: right
-    labelposition: right
-  - id: asiel_en_migratie
-    title: Asiel en Migratie
-    x: 1180
-    'y': 480
-    direction: right
-    labelposition: right
-  - id: klimaat_en_groene_groei
-    title: Klimaat en Groene Groei
-    x: 1180
-    'y': 520
-    direction: right
-    labelposition: right
-  - id: economische_zaken
-    title: Economische Zaken
-    x: 1180
-    'y': 600
-    direction: right
-    labelposition: right
-  - id: volkshuisvesting_en_ruimtelijke_ordening
-    title: Volkshuisvesting en Ruimtelijke Ordening
-    x: 1180
-    'y': 640
-    direction: right
-    labelposition: right
-  - id: financien
-    title: Financiën
-    x: 1180
-    'y': 680
-    direction: right
-    labelposition: right
-  - id: overig
-    title: Overig
-    x: 1180
-    'y': 800
-    direction: right
-    labelposition: right
-  - id: justitie_en_veiligheid
-    title: Justitie en Veiligheid
-    x: 1180
-    'y': 400
-    direction: right
-    labelposition: right
-  - id: rentelasten
-    title: Rentelasten
-    x: 1180
-    'y': 760
-    direction: right
-    labelposition: right
-  - id: landbouw_visserij_voedselzekerheid_en_natuur
-    title: Landbouw, Visserij, Voedselzekerheid en Natuur
-    x: 1180
-    'y': 560
-    direction: right
-    labelposition: right
-  - id: binnenlandse_zaken_en_koninkrijksrelaties
-    title: Binnenlandse Zaken en Koninkrijksrelaties
-    x: 1180
-    'y': 720
-    direction: right
-    labelposition: right
-  - id: begrotingstekort
-    title: Begrotingstekort
-    x: 820
-    'y': 40
-    direction: right
-    labelposition: left
-  - id: omzetbelasting_btw
-    title: Omzetbelasting (btw)
-    x: 400
-    'y': 340
-    direction: right
-    labelposition: left
-  - id: accijnzen
-    title: Accijnzen
-    x: 400
-    'y': 400
-    direction: right
-    labelposition: left
-  - id: overdrachts_en_assurantiebelasting
-    title: Overdrachts- en assurantiebelasting
-    x: 400
-    'y': 440
-    direction: right
-    labelposition: left
-  - id: belastingen_op_een_milieugrondslag
-    title: Belastingen op een milieugrondslag
-    x: 400
-    'y': 480
-    direction: right
-    labelposition: left
-  - id: motorrijtuigenbelasting
-    title: Motorrijtuigenbelasting
-    x: 400
-    'y': 560
-    direction: right
-    labelposition: left
-  - id: invoerrechten
-    title: Invoerrechten
-    x: 400
-    'y': 600
-    direction: right
-    labelposition: left
-  - id: belasting_op_personenautos_en_motorrijwielen_bpm
-    title: Belasting op personenauto's en motorrijwielen (bpm)
-    x: 400
-    'y': 640
-    direction: right
-    labelposition: left
-  - id: verbruiksbelasting
-    title: Verbruiksbelasting
-    x: 400
-    'y': 720
-    direction: right
-    labelposition: left
-  - id: bankbelasting
-    title: Bankbelasting
-    x: 400
-    'y': 520
-    direction: right
-    labelposition: left
-  - id: belasting_op_zware_motorrijtuigen
-    title: Belasting op zware motorrijtuigen
-    x: 400
-    'y': 680
-    direction: right
-    labelposition: left
-  - id: loon_en_inkomstenbelasting
-    title: Loon- en inkomstenbelasting
-    x: 400
-    'y': 80
-    direction: right
-    labelposition: left
-  - id: vennootschapsbelasting
-    title: Vennootschapsbelasting
-    x: 400
-    'y': 140
-    direction: right
-    labelposition: left
-  - id: dividendbelasting
-    title: Dividendbelasting
-    x: 400
-    'y': 260
-    direction: right
-    labelposition: left
-  - id: schenk_en_erfbelasting
-    title: Schenk- en erfbelasting
-    x: 400
-    'y': 180
-    direction: right
-    labelposition: left
-  - id: kansspelbelasting
-    title: Kansspelbelasting
-    x: 400
-    'y': 220
-    direction: right
-    labelposition: left
-  - id: overige_directe_belastingen
-    title: Overig
-    x: 400
-    'y': 300
-    direction: right
-    labelposition: left
-  - id: premies
-    title: Premies
-    x: 600
-    'y': 640
-    direction: right
-    labelposition: right
+- id: co2.from_conversion
+  title: Co2 - From Conversion
+  x: 1250
+  y: 1025
+  direction: right
+  labelposition: right
+- id: coal_derivatives.from_sources
+  title: Coal Derivatives - From Sources
+  x: 666
+  y: 1025
+  direction: right
+  labelposition: right
+- id: conversion.elektriciteitsproductie_centraal
+  title: Conversion - Elektriciteitsproductie Centraal
+  x: 980
+  y: 640
+  direction: right
+  labelposition: right
+- id: conversion.elektriciteitsproductie_centraal.asset_loss
+  title: Conversion - Elektriciteitsproductie Centraal - Asset Loss (66.0%)
+  x: 1040
+  y: 760
+  direction: right
+  labelposition: right
+- id: conversion.energy_loss
+  title: Conversion - Energy Loss
+  x: 1541
+  y: 1025
+  direction: right
+  labelposition: right
+- id: conversion.waterstofproductie
+  title: Conversion - Waterstofproductie
+  x: 1420
+  y: 620
+  direction: right
+  labelposition: right
+- id: conversion.waterstofproductie.asset_loss
+  title: Conversion - Waterstofproductie - Asset Loss (30.0%)
+  x: 1540
+  y: 600
+  direction: right
+  labelposition: right
+- id: electricity.from_conversion
+  title: Electricity - From Conversion
+  x: 1280
+  y: 460
+  direction: right
+  labelposition: right
+- id: electricity.from_conversion.asset_loss
+  title: Electricity - From Conversion - Asset Loss (2.0%)
+  x: 1400
+  y: 440
+  direction: right
+  labelposition: right
+- id: electricity.from_sources
+  title: Electricity - From Sources
+  x: 666
+  y: 625
+  direction: right
+  labelposition: right
+- id: electricity.to_enduse
+  title: Electricity - To Enduse
+  x: 1860
+  y: 460
+  direction: right
+  labelposition: right
+- id: end_use.export
+  title: End Use - Export
+  x: 2125
+  y: 453
+  direction: right
+  labelposition: right
+- id: end_use.finaal_huishoudens
+  title: End Use - Finaal Huishoudens
+  x: 2125
+  y: 396
+  direction: right
+  labelposition: right
+- id: end_use.finaal_industrie_chemie_pre
+  title: End Use - Finaal Industrie Chemie Pre
+  x: 2125
+  y: 339
+  direction: right
+  labelposition: right
+- id: end_use.finaal_industrie_food_pre
+  title: End Use - Finaal Industrie Food Pre
+  x: 2125
+  y: 625
+  direction: right
+  labelposition: right
+- id: end_use.finaal_industrie_kunstmest_pre
+  title: End Use - Finaal Industrie Kunstmest Pre
+  x: 2125
+  y: 796
+  direction: right
+  labelposition: right
+- id: end_use.finaal_industrie_metaal_ferro_pre
+  title: End Use - Finaal Industrie Metaal Ferro Pre
+  x: 2125
+  y: 739
+  direction: right
+  labelposition: right
+- id: end_use.finaal_industrie_metaal_nonferro_pre
+  title: End Use - Finaal Industrie Metaal Nonferro Pre
+  x: 2125
+  y: 910
+  direction: right
+  labelposition: right
+- id: end_use.finaal_industrie_overige_pre
+  title: End Use - Finaal Industrie Overige Pre
+  x: 2125
+  y: 510
+  direction: right
+  labelposition: right
+- id: end_use.finaal_landbouw
+  title: End Use - Finaal Landbouw
+  x: 2125
+  y: 567
+  direction: right
+  labelposition: right
+- id: end_use.finaal_mobiliteit_internationaal
+  title: End Use - Finaal Mobiliteit Internationaal
+  x: 2125
+  y: 1025
+  direction: right
+  labelposition: right
+- id: end_use.finaal_mobiliteit_nationaal
+  title: End Use - Finaal Mobiliteit Nationaal
+  x: 2125
+  y: 682
+  direction: right
+  labelposition: right
+- id: end_use.finaal_overige
+  title: End Use - Finaal Overige
+  x: 2125
+  y: 282
+  direction: right
+  labelposition: right
+- id: end_use.finaal_raffinaderijen_etm
+  title: End Use - Finaal Raffinaderijen Etm
+  x: 2125
+  y: 967
+  direction: right
+  labelposition: right
+- id: end_use.finaal_utiliteit
+  title: End Use - Finaal Utiliteit
+  x: 2125
+  y: 225
+  direction: right
+  labelposition: right
+- id: hydrogen.to_enduse
+  title: Hydrogen - To Enduse
+  x: 1840
+  y: 660
+  direction: right
+  labelposition: right
+- id: methane.from_sources
+  title: Methane - From Sources
+  x: 660
+  y: 300
+  direction: right
+  labelposition: right
+- id: solar_radiation.from_sources
+  title: Solar Radiation - From Sources
+  x: 666
+  y: 1025
+  direction: right
+  labelposition: right
+- id: sources.import
+  title: Sources - Import
+  x: 375
+  y: 1025
+  direction: right
+  labelposition: left
+- id: sources.production
+  title: Sources - Production
+  x: 375
+  y: 225
+  direction: right
+  labelposition: left
+- id: uranium.from_sources
+  title: Uranium - From Sources
+  x: 666
+  y: 225
+  direction: right
+  labelposition: right
+- id: wind.from_sources
+  title: Wind - From Sources
+  x: 666
+  y: 705
+  direction: right
+  labelposition: right
 links:
-  - source.id: indirecte_belastingen
-    target.id: rijksbegroting
-    value: 129
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: directe_belastingen
-    target.id: rijksbegroting
-    value: 173
-    carrier: directe_belasting
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: zorgverzekeringswet
-    target.id: premies
-    value: 61
-    carrier: Premies
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: premies_volksverzekeringen
-    target.id: premies
-    value: 45
-    carrier: Premies
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: premies_werknemersverzekeringen
-    target.id: premies
-    value: 45
-    carrier: Premies
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: uit_sociale_zekerheid
-    value: 124.7
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: uit_zorg
-    value: 119.5
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: uit_defensie
-    value: 35
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: gemeentefonds_en_provinciefonds
-    value: 56.6
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: onderwijs_cultuur_en_wetenschap
-    value: 54.8
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: infrastructuur_en_waterstaat
-    value: 14.9
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: buitenlandse_zaken_en_ontwikkelingshulp
-    value: 15.5
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: asiel_en_migratie
-    value: 8.9
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: klimaat_en_groene_groei
-    value: 4.1
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: economische_zaken
-    value: 2.9
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: volkshuisvesting_en_ruimtelijke_ordening
-    value: 8.8
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: financien
-    value: 3.5
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: overig
-    value: 4.2
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: justitie_en_veiligheid
-    value: 16.8
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: rentelasten
-    value: 9.5
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: landbouw_visserij_voedselzekerheid_en_natuur
-    value: 4.2
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: rijksbegroting
-    target.id: binnenlandse_zaken_en_koninkrijksrelaties
-    value: 3
-    carrier: Uitgaven
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: omzetbelasting_btw
-    target.id: indirecte_belastingen
-    value: 87.8
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: accijnzen
-    target.id: indirecte_belastingen
-    value: 11.5
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: overdrachts_en_assurantiebelasting
-    target.id: indirecte_belastingen
-    value: 9.3
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: belastingen_op_een_milieugrondslag
-    target.id: indirecte_belastingen
-    value: 6.6
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: motorrijtuigenbelasting
-    target.id: indirecte_belastingen
-    value: 5.5
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: invoerrechten
-    target.id: indirecte_belastingen
-    value: 5
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: belasting_op_personenautos_en_motorrijwielen_bpm
-    target.id: indirecte_belastingen
-    value: 1.8
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: verbruiksbelasting
-    target.id: indirecte_belastingen
-    value: 0.6
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: bankbelasting
-    target.id: indirecte_belastingen
-    value: 0.6
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: belasting_op_zware_motorrijtuigen
-    target.id: indirecte_belastingen
-    value: 0.1
-    carrier: indirecte_belastingen
-    type: 0
-    visibility: 1
-    direction: r
-    legend: indirecte_belastingen
-  - source.id: loon_en_inkomstenbelasting
-    target.id: directe_belastingen
-    value: 110
-    carrier: directe_belasting
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: vennootschapsbelasting
-    target.id: directe_belastingen
-    value: 50
-    carrier: directe_belasting
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: dividendbelasting
-    target.id: directe_belastingen
-    value: 7.7
-    carrier: directe_belasting
-    type: 0
-    visibility: 1
-    direction: r
-    legend: directe_belasting
-  - source.id: schenk_en_erfbelasting
-    target.id: directe_belastingen
-    value: 4
-    carrier: directe_belasting
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: kansspelbelasting
-    target.id: directe_belastingen
-    value: 1
-    carrier: directe_belasting
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: overige_directe_belastingen
-    target.id: directe_belastingen
-    value: 0.4
-    carrier: directe_belasting
-    type: 0
-    visibility: 1
-    direction: r
-  - source.id: premies
-    target.id: rijksbegroting
-    value: 151
-    carrier: Premies
-    type: 0
-    visibility: 1
-    direction: r
+- source.id: coal_derivatives.from_sources
+  target.id: conversion.elektriciteitsproductie_centraal
+  value: 93.3
+  carrier: coal
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: conversion.elektriciteitsproductie_centraal
+  target.id: co2.from_conversion
+  value: 69.1
+  carrier: co2
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Kolencentrale: 50.9% (35.2 TWh)
+    Gascentrale: 49.1% (34.0 TWh)
+- source.id: conversion.elektriciteitsproductie_centraal
+  target.id: electricity.from_conversion
+  value: 192.5
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Gascentrale: 35.0% (67.4 TWh)
+    Windparken: 26.5% (51.0 TWh)
+    Kolencentrale: 22.2% (42.8 TWh)
+    Kerncentrale: 13.7% (26.3 TWh)
+    Zonneparken: 2.7% (5.1 TWh)
+- source.id: conversion.waterstofproductie
+  target.id: hydrogen.to_enduse
+  value: 20.6
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Elektrolyse: 100.0% (20.6 TWh)'
+- source.id: electricity.from_conversion
+  target.id: conversion.energy_loss
+  value: 3.5
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Pwr Centr: 100.0% (3.5 TWh)'
+- source.id: electricity.from_conversion
+  target.id: conversion.waterstofproductie
+  value: 29.4
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Elektrolyse: 100.0% (29.4 TWh)'
+- source.id: electricity.from_conversion
+  target.id: electricity.to_enduse
+  value: 197.2
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: electricity.from_sources
+  target.id: electricity.from_conversion
+  value: 41.6
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: electricity.to_enduse
+  target.id: end_use.export
+  value: 20.1
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Export elektriciteit: 100.0% (20.1 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_huishoudens
+  value: 27.5
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Dem Elec Res Appl: 74.5% (20.5 TWh)
+    Dem Elec Res Heat: 25.5% (7.0 TWh)
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_industrie_chemie_pre
+  value: 26.5
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Ind Chem: 100.0% (26.5 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_industrie_food_pre
+  value: 10.9
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Ind Food: 100.0% (10.9 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_industrie_kunstmest_pre
+  value: 0.6
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Ind Fert: 100.0% (0.6 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_industrie_metaal_ferro_pre
+  value: 4.8
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Ind Ferro: 100.0% (4.8 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_industrie_metaal_nonferro_pre
+  value: 2.1
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Ind Nonfer: 100.0% (2.1 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_industrie_overige_pre
+  value: 7.7
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Dem Elec Ind Data: 42.9% (3.3 TWh)
+    Dem Elec Ind Paper: 39.8% (3.0 TWh)
+    Dem Elec Ind Oth: 17.3% (1.3 TWh)
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_landbouw
+  value: 11.6
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Agri: 100.0% (11.6 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_mobiliteit_internationaal
+  value: 0.4
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Trns Aviint: 100.0% (0.4 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_mobiliteit_nationaal
+  value: 10.2
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Dem Elec Trns Car: 42.8% (4.4 TWh)
+    Dem Elec Trns Train: 20.7% (2.1 TWh)
+    Dem Elec Trns Truck: 20.0% (2.0 TWh)
+    Dem Elec Trns Van: 10.4% (1.1 TWh)
+    Dem Elec Trns Avidom: 3.1% (0.3 TWh)
+    Dem Elec Trns Bus: 2.9% (0.3 TWh)
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_overige
+  value: 35.8
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Oth: 100.0% (35.8 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_raffinaderijen_etm
+  value: 1.6
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem Elec Ind Ref: 100.0% (1.6 TWh)'
+- source.id: electricity.to_enduse
+  target.id: end_use.finaal_utiliteit
+  value: 37.5
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Dem Elec Serv Appl: 82.5% (31.0 TWh)
+    Dem Elec Serv Heat: 17.5% (6.6 TWh)
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_huishoudens
+  value: 0.0
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem H2 Res Heat: 100.0% (0.0 TWh)'
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_industrie_chemie_pre
+  value: 1.5
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem H2 Ind Chem: 100.0% (1.5 TWh)'
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_industrie_kunstmest_pre
+  value: 5.2
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem H2 Feeds Ind Fert: 100.0% (5.2 TWh)'
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_industrie_metaal_ferro_pre
+  value: 1.9
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem H2 Ind Ferro: 100.0% (1.9 TWh)'
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_industrie_overige_pre
+  value: 10.6
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Dem H2 Ind Oth: 97.3% (10.3 TWh)
+    Dem H2 Ind Paper: 2.7% (0.3 TWh)
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_mobiliteit_nationaal
+  value: 0.4
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: |-
+    Dem H2 Trns Truck: 50.6% (0.2 TWh)
+    Dem H2 Trns Train: 35.0% (0.1 TWh)
+    Dem H2 Trns Bus: 14.5% (0.1 TWh)
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_overige
+  value: 0.3
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem H2 Oth: 100.0% (0.3 TWh)'
+- source.id: hydrogen.to_enduse
+  target.id: end_use.finaal_utiliteit
+  value: 0.7
+  carrier: hydrogen
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Dem H2 Serv Heat: 100.0% (0.7 TWh)'
+- source.id: methane.from_sources
+  target.id: conversion.elektriciteitsproductie_centraal
+  value: 139.4
+  carrier: methane
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: solar_radiation.from_sources
+  target.id: conversion.elektriciteitsproductie_centraal
+  value: 5.1
+  carrier: solar_radiation
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: sources.import
+  target.id: coal_derivatives.from_sources
+  value: 93.3
+  carrier: coal
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Import kolen: 100.0% (93.3 TWh)'
+- source.id: sources.import
+  target.id: electricity.from_sources
+  value: 41.6
+  carrier: electricity
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Import electriciteit: 100.0% (41.6 TWh)'
+- source.id: sources.import
+  target.id: uranium.from_sources
+  value: 477.8
+  carrier: uranium
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Imprt Uranium: 100.0% (477.8 TWh)'
+- source.id: sources.production
+  target.id: methane.from_sources
+  value: 139.4
+  carrier: methane
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Aardgas winning: 100.0% (139.4 TWh)'
+- source.id: sources.production
+  target.id: solar_radiation.from_sources
+  value: 5.1
+  carrier: solar_radiation
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Prod Solar Radiation: 100.0% (5.1 TWh)'
+- source.id: sources.production
+  target.id: wind.from_sources
+  value: 51.0
+  carrier: wind
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: 'Prod Wind: 100.0% (51.0 TWh)'
+- source.id: uranium.from_sources
+  target.id: conversion.elektriciteitsproductie_centraal
+  value: 477.8
+  carrier: uranium
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: wind.from_sources
+  target.id: conversion.elektriciteitsproductie_centraal
+  value: 51.0
+  carrier: wind
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: electricity.from_conversion
+  target.id: electricity.from_conversion.asset_loss
+  value: 4.0
+  carrier: loss
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: conversion.waterstofproductie
+  target.id: conversion.waterstofproductie.asset_loss
+  value: 8.8
+  carrier: loss
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
+- source.id: conversion.elektriciteitsproductie_centraal
+  target.id: conversion.elektriciteitsproductie_centraal.asset_loss
+  value: 504.9
+  carrier: loss
+  type: 0
+  visibility: 1
+  direction: r
+  annotate: ''
 carriers:
-  - id: Premies
-    color: '#db4c33'
-  - id: Uitgaven
-    color: '#73b0af'
-  - id: Begrotingstekort
-    color: '#696969'
-  - id: directe_belasting
-    color: '#a167da'
-  - id: indirecte_belastingen
-    color: '#3498db'
+- id: coal
+  color: '#555555'
+- id: electricity
+  color: '#f0c850'
+- id: hydrogen
+  color: '#7850c8'
+- id: methane
+  color: '#285a8c'
+- id: loss
+  color: '#888888'
+- id: co2
+  color: '#aaaaaa'
+- id: solar_radiation
+  color: '#aaaaaa'
+- id: uranium
+  color: '#c49c94'
+- id: wind
+  color: '#62D3A4'
 settings:
-  - setting: scaleDataValue
-    waarde: 1
-  - setting: scaleHeight
-    waarde: 0.3
-  - setting: scaleCanvas
-    waarde: 0.8
-  - setting: canvasWidth
-    waarde: 1250
-  - setting: canvasHeight
-    waarde: 700
-  - setting: title
-    waarde: Miljoenennota 2026 (voorbeeld diagram)
-  - setting: titleFontSize
-    waarde: 20
-  - setting: titlePositionX
-    waarde: 40
-  - setting: titlePositionY
-    waarde: 45
-  - setting: titleColor
-    waarde: '#000000'
-  - setting: backgroundColor
-    waarde: '#eef5fa'
-  - setting: globalFlowOpacity
-    waarde: 0.9
-  - setting: nodeWidth
-    waarde: 4
-  - setting: nodeColor
-    waarde: '#000000'
-  - setting: labelFillColor
-    waarde: '#ffffff'
-  - setting: labelTextColor
-    waarde: '#000000'
-  - setting: showValueLabels
-    waarde: true
-  - setting: transparentBackground
-    waarde: false
-  - setting: unit
-    waarde: miljard euro
-  - setting: decimalsRoundValues
-    waarde: 1
+- setting: scaleDataValue
+  waarde: 1
+- setting: scaleHeight
+  waarde: 0.3
+- setting: scaleCanvas
+  waarde: 0.8
+- setting: canvasWidth
+  waarde: 2500
+- setting: canvasHeight
+  waarde: 1250
+- setting: title
+  waarde: NSWPH Energy System Sankey
+- setting: titleFontSize
+  waarde: 20
+- setting: titlePositionX
+  waarde: 40
+- setting: titlePositionY
+  waarde: 45
+- setting: titleColor
+  waarde: '#000000'
+- setting: backgroundColor
+  waarde: '#eef5fa'
+- setting: globalFlowOpacity
+  waarde: 0.9
+- setting: nodeWidth
+  waarde: 4
+- setting: nodeColor
+  waarde: '#000000'
+- setting: labelFillColor
+  waarde: '#ffffff'
+- setting: labelTextColor
+  waarde: '#000000'
+- setting: showValueLabels
+  waarde: true
+- setting: transparentBackground
+  waarde: false
+- setting: unit
+  waarde: TWh
+- setting: decimalsRoundValues
+  waarde: 1
 remarks: {}
