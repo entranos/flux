@@ -1320,6 +1320,11 @@ function importJSONFile() {
         window.settings = transformedSettings; // transformData already returns an array
         window.remarks = jsonData.remarks || [];
         
+        // Update settingsGlobal used by D3 diagram
+        if (typeof settingsGlobal !== 'undefined') {
+          settingsGlobal = transformedSettings;
+        }
+        
         // Store original data for export purposes (keep in original array format)
         window.originalExcelData = {
           nodes: JSON.parse(JSON.stringify(jsonData.nodes)),
@@ -1653,6 +1658,11 @@ function importYAMLFile() {
         window.legend = data.carriers; // Keep both for compatibility
         window.settings = transformedSettings;
         window.remarks = data.remarks || [];
+        
+        // Update settingsGlobal used by D3 diagram
+        if (typeof settingsGlobal !== 'undefined') {
+          settingsGlobal = transformedSettings;
+        }
         
         // Store original data
         window.originalExcelData = {
@@ -2321,6 +2331,11 @@ window.handleExcelImport = function handleExcelImport(event, isDragDrop = false)
       window.legend = legend;
       window.settings = transformedSettings;
       window.remarks = remarks;
+      
+      // Update settingsGlobal used by D3 diagram
+      if (typeof settingsGlobal !== 'undefined') {
+        settingsGlobal = transformedSettings;
+      }
 
       // Store original unscaled links data
       window.originalLinksData = JSON.parse(JSON.stringify(links));
@@ -6748,6 +6763,11 @@ window.updateDecimalsRoundValues = function updateDecimalsRoundValues(newDecimal
         window.settings[0].decimalsRoundValues = decimalsValue;
       }
       
+      // Update settingsGlobal used by D3 diagram
+      if (typeof settingsGlobal !== 'undefined' && settingsGlobal[0]) {
+        settingsGlobal[0].decimalsRoundValues = decimalsValue;
+      }
+      
       // Refresh the diagram to apply new rounding
       if (typeof refreshDiagram === 'function') {
         refreshDiagram();
@@ -7468,6 +7488,11 @@ function setupDragAndDrop() {
     window.legend = data.carriers; // Keep both for compatibility
     window.settings = transformedSettings;
     window.remarks = data.remarks || [];
+    
+    // Update settingsGlobal used by D3 diagram
+    if (typeof settingsGlobal !== 'undefined') {
+      settingsGlobal = transformedSettings;
+    }
     
     // Store original data
     window.originalExcelData = {

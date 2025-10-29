@@ -201,6 +201,11 @@ function fileLoadButton () {
     config.settings = settings
     config.legend = legend
 
+    // Update settingsGlobal used by D3 diagram
+    if (typeof settingsGlobal !== 'undefined') {
+      settingsGlobal = settings
+    }
+
     globalscaleHeight = settings[0].scaleHeight
     globalCO2flowScale = settings[0].scaleDataValueCO2flow
 
