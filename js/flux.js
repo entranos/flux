@@ -5467,6 +5467,9 @@ window.saveLinkEdit = function saveLinkEdit() {
   // console.log('Original data:', currentEditingLink.data);
   // console.log('New values:', { newSource, newTarget, newValue, newLegend, newDirection });
   
+  // Declare globalLinkIndex at function scope so it's accessible throughout
+  let globalLinkIndex = -1;
+  
   // Update the D3-bound data object
   currentEditingLink.data.source = newSource;
   currentEditingLink.data.target = newTarget;
@@ -5482,7 +5485,6 @@ window.saveLinkEdit = function saveLinkEdit() {
     // console.log('Total links in global array:', window.links.length);
     
     // First try to match by index (most reliable)
-    let globalLinkIndex = -1;
     if (currentEditingLink.data.index !== undefined) {
       // Try direct index match
       if (currentEditingLink.data.index < window.links.length) {
@@ -5577,6 +5579,35 @@ window.saveLinkEdit = function saveLinkEdit() {
     }
   }
   
+  // CRITICAL FIX: Also update window.originalLinksData for export functionality
+  // This ensures edited values are included when exporting to Excel/JSON/YAML
+  if (window.originalLinksData && Array.isArray(window.originalLinksData) && globalLinkIndex > -1) {
+    // Use the same index from the window.links update
+    if (globalLinkIndex < window.originalLinksData.length) {
+      // Update originalLinksData to match the edited values
+      if (window.originalLinksData[globalLinkIndex]['source.id'] !== undefined) {
+        window.originalLinksData[globalLinkIndex]['source.id'] = newSource;
+      }
+      if (window.originalLinksData[globalLinkIndex]['target.id'] !== undefined) {
+        window.originalLinksData[globalLinkIndex]['target.id'] = newTarget;
+      }
+      if (window.originalLinksData[globalLinkIndex].source !== undefined) {
+        window.originalLinksData[globalLinkIndex].source = newSource;
+      }
+      if (window.originalLinksData[globalLinkIndex].target !== undefined) {
+        window.originalLinksData[globalLinkIndex].target = newTarget;
+      }
+      
+      window.originalLinksData[globalLinkIndex].value = newValue;
+      window.originalLinksData[globalLinkIndex].legend = newLegend;
+      window.originalLinksData[globalLinkIndex].carrier = newLegend;
+      if (newDirection !== undefined) {
+        window.originalLinksData[globalLinkIndex].direction = newDirection;
+      }
+      // console.log('Updated originalLinksData for export:', window.originalLinksData[globalLinkIndex]);
+    }
+  }
+  
   // console.log('Saved link changes:', currentEditingLink.data);
   
   // Close popup first
@@ -5657,6 +5688,15 @@ window.deleteLink = function deleteLink() {
         const deletedSankeyLink = window.sankeyDataObject.links[sankeyLinkIndex];
         window.sankeyDataObject.links.splice(sankeyLinkIndex, 1);
         // console.log('Also removed link from sankeyDataObject:', deletedSankeyLink);
+      }
+    }
+    
+    // CRITICAL FIX: Also remove from window.originalLinksData for export functionality
+    if (window.originalLinksData && Array.isArray(window.originalLinksData)) {
+      if (globalLinkIndex < window.originalLinksData.length) {
+        const deletedOriginalLink = window.originalLinksData[globalLinkIndex];
+        window.originalLinksData.splice(globalLinkIndex, 1);
+        // console.log('Also removed link from originalLinksData:', deletedOriginalLink);
       }
     }
     
@@ -6078,6 +6118,11 @@ window.saveNewFlow = function saveNewFlow() {
   if (!window.links) window.links = [];
   window.links.push(newLink);
   // console.log('Added to window.links. Total links:', window.links.length);
+  
+  // CRITICAL FIX: Also add to window.originalLinksData for export functionality
+  if (!window.originalLinksData) window.originalLinksData = [];
+  window.originalLinksData.push({...newLink}); // Use spread to create a copy
+  // console.log('Added to window.originalLinksData. Total links:', window.originalLinksData.length);
   
   // Also add to sankeyDataObject if it exists
   if (window.sankeyDataObject) {
