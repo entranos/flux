@@ -4371,33 +4371,45 @@ function updateCarrierColor(carrierId, newColor) {
     const carrierItem = window.carriers.find(item => item.id === carrierId);
     if (carrierItem) {
       carrierItem.color = newColor;
-      
-      // Update the diagram
-      const sankeyDiagram = document.querySelector('#energyflows_sankeySVGPARENT');
-      if (sankeyDiagram) {
-        const flows = sankeyDiagram.querySelectorAll('.links .link path');
-        flows.forEach(flow => {
-          const flowData = flow.__data__;
-          if (flowData && flowData.carrier === carrierId) {
-            flow.style.fill = newColor;
-          }
-        });
-      }
+    }
+  }
+
+  // CRITICAL FIX: Also update window.legend (they need to be in sync)
+  if (window.legend) {
+    const legendItem = window.legend.find(item => item.id === carrierId);
+    if (legendItem) {
+      legendItem.color = newColor;
     }
   }
 
   // Update the config legend if it exists
   if (window.currentSankeyConfig && window.currentSankeyConfig.legend) {
-    const configLegendItem = window.currentSankeyConfig.legend.find(item => item.id === legendId);
+    const configLegendItem = window.currentSankeyConfig.legend.find(item => item.id === carrierId);
     if (configLegendItem) {
       configLegendItem.color = newColor;
     }
   }
 
-  // Update the sankeyDataObject links that use this legend
+  // Update the config carriers if it exists
+  if (window.currentSankeyConfig && window.currentSankeyConfig.carriers) {
+    const configCarrierItem = window.currentSankeyConfig.carriers.find(item => item.id === carrierId);
+    if (configCarrierItem) {
+      configCarrierItem.color = newColor;
+    }
+  }
+
+  // Update originalExcelData for export functionality
+  if (window.originalExcelData && window.originalExcelData.carriers) {
+    const originalCarrierItem = window.originalExcelData.carriers.find(item => item.id === carrierId);
+    if (originalCarrierItem) {
+      originalCarrierItem.color = newColor;
+    }
+  }
+
+  // Update the sankeyDataObject links that use this carrier
   if (window.sankeyDataObject && window.sankeyDataObject.links) {
     window.sankeyDataObject.links.forEach(link => {
-      if (link.legend === legendId) {
+      if (link.carrier === carrierId || link.legend === carrierId) {
         link.color = newColor;
       }
     });
@@ -4406,7 +4418,7 @@ function updateCarrierColor(carrierId, newColor) {
   // Also update any global sankeyData if it exists (used by some functions)
   if (window.sankeyData && window.sankeyData.links) {
     window.sankeyData.links.forEach(link => {
-      if (link.legend === legendId) {
+      if (link.carrier === carrierId || link.legend === carrierId) {
         link.color = newColor;
       }
     });
@@ -4415,11 +4427,11 @@ function updateCarrierColor(carrierId, newColor) {
   // Update any existing data bound to DOM elements
   const sankeyDiagram = document.querySelector('#energyflows_sankeySVGPARENT');
   if (sankeyDiagram) {
-    // Update all link paths that use this legend
+    // Update all link paths that use this carrier
     const linkGroups = sankeyDiagram.querySelectorAll('.links .link');
     linkGroups.forEach(linkGroup => {
       const pathElement = linkGroup.querySelector('path');
-      if (pathElement && pathElement.__data__ && pathElement.__data__.legend === legendId) {
+      if (pathElement && pathElement.__data__ && (pathElement.__data__.carrier === carrierId || pathElement.__data__.legend === carrierId)) {
         // Update the data bound to the element
         pathElement.__data__.color = newColor;
         // Update the visual styling
@@ -4431,13 +4443,13 @@ function updateCarrierColor(carrierId, newColor) {
     // Also update the parent group's data if it exists
     const linkGroups2 = sankeyDiagram.querySelectorAll('.links .link');
     linkGroups2.forEach(linkGroup => {
-      if (linkGroup.__data__ && linkGroup.__data__.legend === legendId) {
+      if (linkGroup.__data__ && (linkGroup.__data__.carrier === carrierId || linkGroup.__data__.legend === carrierId)) {
         linkGroup.__data__.color = newColor;
       }
     });
   }
 
-  // console.log('Legend color updated successfully');
+  // console.log('Carrier color updated successfully in all data structures');
 }
 
 // Function to update scroll extent width
