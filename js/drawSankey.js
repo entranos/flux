@@ -573,9 +573,8 @@ function drawSankey (sankeyDataInput, config) {
       if (d.carrier === 'co2flow') {
         return d.carrier + ' | ' + parseInt(d.value * globalCO2flowScale) + ' kton CO2'
       } else {
-        if (currentUnit === 'TWh') {
-          return d.carrier + ' | ' + parseInt(d.value / 3.6) + ' TWh'
-        } else if (currentUnit) {
+        // Display the actual value without automatic conversion
+        if (currentUnit) {
           return d.carrier + ' | ' + parseInt(d.value) + ' ' + currentUnit
         } else {
           return d.carrier + ' | ' + parseInt(d.value)
@@ -931,9 +930,9 @@ function showValueOnHover (value) {
       // Show '0' for small values in regular flow tooltips too
       const displayValue = (originalValue > 0 && originalValue < 0.5) ? 0 : originalValue
 
-      if (currentUnit === 'TWh') {
-        return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue / 3.6)) + ' TWh'
-      } else if (currentUnit) {
+      // Display the actual value without automatic conversion
+      // The value stored in the data is the value that should be displayed
+      if (currentUnit) {
         return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue)) + ' ' + currentUnit
       } else {
         return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue))
