@@ -644,27 +644,16 @@ function exportToExcel() {
 
   // Get current data with all modifications (including edits)
   const currentNodes = window.nodesGlobal || (sankeyDataObject && sankeyDataObject.nodes ? sankeyDataObject.nodes : []);
-  // Clean the links data to remove D3-specific properties before export
-  const rawLinks = window.links || window.originalLinksData;
-  const currentLinks = cleanLinksForExport(rawLinks);
   
-  // console.log('Links cleaning debug:', {
-  //   rawLinksCount: rawLinks ? rawLinks.length : 0,
-  //   cleanLinksCount: currentLinks ? currentLinks.length : 0,
-  //   sampleRawLink: rawLinks && rawLinks[0] ? Object.keys(rawLinks[0]) : [],
-  //   sampleCleanLink: currentLinks && currentLinks[0] ? Object.keys(currentLinks[0]) : []
-  // });
+  // SIMPLIFIED: Use originalLinksData directly like YAML export does
+  // This avoids any cleaning/formatting issues
+  const currentLinks = window.originalLinksData || window.links;
+  
   const currentLegend = window.carriers;
   const currentSettings = window.settings;
   const currentRemarks = window.remarks;
 
-  // console.log('=== SELECTED DATA FOR EXPORT ===');
-  // console.log('Using nodes from:', window.nodesGlobal ? 'window.nodesGlobal' : 'sankeyDataObject.nodes');
-  // console.log('Using links from:', window.links ? 'window.links' : 'window.originalLinksData');
-  // console.log('Current nodes count:', currentNodes ? currentNodes.length : 'N/A');
-  // console.log('Current links count:', currentLinks ? currentLinks.length : 'N/A');
-
-  if (!currentNodes || !currentLinks || !currentLegend || !currentSettings) {  // currentLegend contains carriers data
+  if (!currentNodes || !currentLinks || !currentLegend || !currentSettings) {
     alert('Missing current data for export. Please ensure the diagram is fully loaded.');
     return;
   }
@@ -677,21 +666,15 @@ function exportToExcel() {
   //   remarks: currentRemarks ? currentRemarks.length : 0
   // });
 
-  // Create updated nodes data with current positions
-  const updatedNodes = currentNodes.map(node => {
-    const originalNode = window.originalExcelData.nodes.find(n => n.id === node.id) || {};
-    return {
-      ...originalNode, // Start with original data
-      // Update with current position data (prioritize current data)
-      x: node.x !== undefined ? node.x : (node.x0 !== undefined ? node.x0 : originalNode.x),
-      y: node.y !== undefined ? node.y : (node.y0 !== undefined ? node.y0 : originalNode.y),
-      // Include any other modified properties
-      title: node.title || originalNode.title,
-      id: node.id || originalNode.id,
-      direction: node.direction || originalNode.direction,
-      labelposition: node.labelposition || originalNode.labelposition
-    };
-  });
+  // SIMPLIFIED: Map nodes to clean structure like YAML export does
+  const updatedNodes = currentNodes.map(node => ({
+    id: node.id,
+    title: node.title,
+    x: node.x !== undefined ? node.x : node.x0,
+    y: node.y !== undefined ? node.y : node.y0,
+    direction: node.direction,
+    labelposition: node.labelposition
+  }));
 
   // Transform current settings back to original format (reverse the transformData function)
   const updatedSettings = [];
@@ -827,13 +810,13 @@ function exportToExcel() {
     };
   }
 
-  // Define which sheets need to be updated with current data (filter out name/title columns)
+  // SIMPLIFIED: Export data directly without filtering (like YAML export)
   const sheetsToUpdate = [
-    { name: 'links', data: filterExportColumns(currentLinks, 'links') },
-    { name: 'nodes', data: filterExportColumns(updatedNodes, 'nodes') },
-    { name: 'carriers', data: filterExportColumns(currentLegend, 'carriers') },
-    { name: 'settings', data: updatedSettings }, // Settings don't need filtering
-    { name: 'remarks', data: currentRemarks || [] } // Remarks don't need filtering
+    { name: 'links', data: currentLinks },
+    { name: 'nodes', data: updatedNodes },
+    { name: 'carriers', data: currentLegend },
+    { name: 'settings', data: updatedSettings },
+    { name: 'remarks', data: currentRemarks || [] }
   ];
 
   // Now update only the specific sheets that need current data
@@ -1127,8 +1110,10 @@ function exportToJSON() {
 
   // Get current data with all modifications
   const currentNodes = window.nodesGlobal || (sankeyDataObject && sankeyDataObject.nodes ? sankeyDataObject.nodes : []);
-  const rawLinks = window.links || window.originalLinksData;
-  const currentLinks = cleanLinksForExport(rawLinks);
+  
+  // SIMPLIFIED: Use originalLinksData directly like YAML export does
+  const currentLinks = window.originalLinksData || window.links;
+  
   const currentCarriers = window.carriers || window.legend || [];
   const currentSettings = window.settings || [];
   const currentRemarks = window.remarks || [];
@@ -1335,6 +1320,11 @@ function importJSONFile() {
         window.settings = transformedSettings; // transformData already returns an array
         window.remarks = jsonData.remarks || [];
         
+        // Update settingsGlobal used by D3 diagram
+        if (typeof settingsGlobal !== 'undefined') {
+          settingsGlobal = transformedSettings;
+        }
+        
         // Store original data for export purposes (keep in original array format)
         window.originalExcelData = {
           nodes: JSON.parse(JSON.stringify(jsonData.nodes)),
@@ -1368,16 +1358,31 @@ function importJSONFile() {
         // Clear the existing SVG content before importing new data
         const existingSvg = document.querySelector('#energyflows_sankeySVGPARENT');
         if (existingSvg) {
-          // console.log('Clearing existing SVG content...');
-          existingSvg.innerHTML = '';
+          existingSvg.remove();
         }
         
         // Clear the container to force a fresh render
         const container = document.getElementById('SVGContainer_energyflows');
         if (container) {
-          // console.log('Clearing container...');
           container.innerHTML = '';
         }
+        
+        // Reset sankey instances to avoid conflicts with old state
+        if (typeof sankeyInstances !== 'undefined') {
+          Object.keys(sankeyInstances).forEach(key => delete sankeyInstances[key]);
+        }
+        if (typeof window.sankeyInstances !== 'undefined') {
+          Object.keys(window.sankeyInstances).forEach(key => delete window.sankeyInstances[key]);
+        }
+        if (typeof sankeyDataObject !== 'undefined') {
+          sankeyDataObject = {links: [], nodes: []};
+        }
+        if (typeof window.sankeyDataObject !== 'undefined') {
+          window.sankeyDataObject = {links: [], nodes: []};
+        }
+        
+        // Set flag to disable transitions during import
+        window.isImporting = true;
         
         // Process the data to render the diagram
         // Check for both global processData and window.processData
@@ -1487,7 +1492,8 @@ function exportToYAML() {
   try {
     // Get current data with all modifications
     const currentNodes = window.nodesGlobal || (sankeyDataObject && sankeyDataObject.nodes ? sankeyDataObject.nodes : []);
-    const rawLinks = window.links || window.originalLinksData;
+    // IMPORTANT: Use originalLinksData for export to avoid D3-modified links with extra properties
+    const rawLinks = window.originalLinksData || window.links;
     
     if (!currentNodes || !rawLinks) {
       alert('No data available to export');
@@ -1653,6 +1659,11 @@ function importYAMLFile() {
         window.settings = transformedSettings;
         window.remarks = data.remarks || [];
         
+        // Update settingsGlobal used by D3 diagram
+        if (typeof settingsGlobal !== 'undefined') {
+          settingsGlobal = transformedSettings;
+        }
+        
         // Store original data
         window.originalExcelData = {
           nodes: JSON.parse(JSON.stringify(data.nodes)),
@@ -1682,19 +1693,33 @@ function importYAMLFile() {
         // console.log('Config:', window.currentSankeyConfig);
         
         // Clear existing SVG content
-        // console.log('Clearing existing SVG content...');
         const existingSVG = document.getElementById('energyflows_sankeySVGPARENT');
         if (existingSVG) {
-          existingSVG.innerHTML = '';
           existingSVG.remove();
         }
         
-        // // Clear the container
-        // console.log('Clearing container...');
+        // Clear the container
         const container = document.getElementById('SVGContainer_energyflows');
         if (container) {
           container.innerHTML = '';
         }
+        
+        // Reset sankey instances to avoid conflicts with old state
+        if (typeof sankeyInstances !== 'undefined') {
+          Object.keys(sankeyInstances).forEach(key => delete sankeyInstances[key]);
+        }
+        if (typeof window.sankeyInstances !== 'undefined') {
+          Object.keys(window.sankeyInstances).forEach(key => delete window.sankeyInstances[key]);
+        }
+        if (typeof sankeyDataObject !== 'undefined') {
+          sankeyDataObject = {links: [], nodes: []};
+        }
+        if (typeof window.sankeyDataObject !== 'undefined') {
+          window.sankeyDataObject = {links: [], nodes: []};
+        }
+        
+        // Set flag to disable transitions during import
+        window.isImporting = true;
         
         // Call processData to render the diagram
         // console.log('Calling processData...');
@@ -2244,14 +2269,32 @@ window.handleExcelImport = function handleExcelImport(event, isDragDrop = false)
       // console.log('Final transformed settings:', transformedSettings[0]);
 
       // Clear existing diagram and reset global state
+      // IMPORTANT: Remove the entire SVG element, not just its contents
+      // This ensures D3 doesn't try to update old elements with stale data
+      const existingSVG = document.getElementById('energyflows_sankeySVGPARENT');
+      if (existingSVG) {
+        existingSVG.remove();
+      }
+      
+      // Clear the main container
       d3.select('#sankeyContainer_main').html('');
 
       // Reset sankey instances to avoid conflicts
+      // Force reset by accessing the global variable directly
       if (typeof sankeyInstances !== 'undefined') {
-        sankeyInstances = {};
+        // Clear all properties from the object
+        Object.keys(sankeyInstances).forEach(key => delete sankeyInstances[key]);
       }
       if (typeof window.sankeyInstances !== 'undefined') {
-        window.sankeyInstances = {};
+        Object.keys(window.sankeyInstances).forEach(key => delete window.sankeyInstances[key]);
+      }
+      
+      // Also reset the sankeyDataObject to ensure clean state
+      if (typeof sankeyDataObject !== 'undefined') {
+        sankeyDataObject = {links: [], nodes: []};
+      }
+      if (typeof window.sankeyDataObject !== 'undefined') {
+        window.sankeyDataObject = {links: [], nodes: []};
       }
 
       // Create the container structure that the sankey expects
@@ -2288,6 +2331,11 @@ window.handleExcelImport = function handleExcelImport(event, isDragDrop = false)
       window.legend = legend;
       window.settings = transformedSettings;
       window.remarks = remarks;
+      
+      // Update settingsGlobal used by D3 diagram
+      if (typeof settingsGlobal !== 'undefined') {
+        settingsGlobal = transformedSettings;
+      }
 
       // Store original unscaled links data
       window.originalLinksData = JSON.parse(JSON.stringify(links));
@@ -2319,6 +2367,9 @@ window.handleExcelImport = function handleExcelImport(event, isDragDrop = false)
 
       // Set a flag to disable problematic event handlers during import
       window.disableMouseEvents = true;
+      
+      // Set flag to disable transitions during import (prevents interpolation errors)
+      window.isImporting = true;
 
       // Reset the selection buttons flag to ensure they get initialized
       if (typeof selectionButtonsHaveInitialized !== 'undefined') {
@@ -2346,21 +2397,6 @@ window.handleExcelImport = function handleExcelImport(event, isDragDrop = false)
           //   settingsCount: transformedSettings.length,
           //   remarksCount: remarks.length,
           //   configKeys: Object.keys(config)
-          // });
-
-          // Debug: Check the structure of the first few links
-          // console.log('Sample link data structure:', {
-          //   firstLink: links[0],
-          //   linkKeys: links.length > 0 ? Object.keys(links[0]) : [],
-          //   hasPoints: links.length > 0 && links[0].hasOwnProperty('points'),
-          //   sampleLinkProperties: links.slice(0, 3).map(link => ({
-          //     source: link.source || link['source.id'],
-          //     target: link.target || link['target.id'],
-          //     value: link.value,
-          //     legend: link.legend,
-          //     hasPoints: link.hasOwnProperty('points'),
-          //     keys: Object.keys(link)
-          //   }))
           // });
 
           processData(links, nodes, legend, transformedSettings, remarks, config);
@@ -4335,33 +4371,45 @@ function updateCarrierColor(carrierId, newColor) {
     const carrierItem = window.carriers.find(item => item.id === carrierId);
     if (carrierItem) {
       carrierItem.color = newColor;
-      
-      // Update the diagram
-      const sankeyDiagram = document.querySelector('#energyflows_sankeySVGPARENT');
-      if (sankeyDiagram) {
-        const flows = sankeyDiagram.querySelectorAll('.links .link path');
-        flows.forEach(flow => {
-          const flowData = flow.__data__;
-          if (flowData && flowData.carrier === carrierId) {
-            flow.style.fill = newColor;
-          }
-        });
-      }
+    }
+  }
+
+  // CRITICAL FIX: Also update window.legend (they need to be in sync)
+  if (window.legend) {
+    const legendItem = window.legend.find(item => item.id === carrierId);
+    if (legendItem) {
+      legendItem.color = newColor;
     }
   }
 
   // Update the config legend if it exists
   if (window.currentSankeyConfig && window.currentSankeyConfig.legend) {
-    const configLegendItem = window.currentSankeyConfig.legend.find(item => item.id === legendId);
+    const configLegendItem = window.currentSankeyConfig.legend.find(item => item.id === carrierId);
     if (configLegendItem) {
       configLegendItem.color = newColor;
     }
   }
 
-  // Update the sankeyDataObject links that use this legend
+  // Update the config carriers if it exists
+  if (window.currentSankeyConfig && window.currentSankeyConfig.carriers) {
+    const configCarrierItem = window.currentSankeyConfig.carriers.find(item => item.id === carrierId);
+    if (configCarrierItem) {
+      configCarrierItem.color = newColor;
+    }
+  }
+
+  // Update originalExcelData for export functionality
+  if (window.originalExcelData && window.originalExcelData.carriers) {
+    const originalCarrierItem = window.originalExcelData.carriers.find(item => item.id === carrierId);
+    if (originalCarrierItem) {
+      originalCarrierItem.color = newColor;
+    }
+  }
+
+  // Update the sankeyDataObject links that use this carrier
   if (window.sankeyDataObject && window.sankeyDataObject.links) {
     window.sankeyDataObject.links.forEach(link => {
-      if (link.legend === legendId) {
+      if (link.carrier === carrierId || link.legend === carrierId) {
         link.color = newColor;
       }
     });
@@ -4370,7 +4418,7 @@ function updateCarrierColor(carrierId, newColor) {
   // Also update any global sankeyData if it exists (used by some functions)
   if (window.sankeyData && window.sankeyData.links) {
     window.sankeyData.links.forEach(link => {
-      if (link.legend === legendId) {
+      if (link.carrier === carrierId || link.legend === carrierId) {
         link.color = newColor;
       }
     });
@@ -4379,11 +4427,11 @@ function updateCarrierColor(carrierId, newColor) {
   // Update any existing data bound to DOM elements
   const sankeyDiagram = document.querySelector('#energyflows_sankeySVGPARENT');
   if (sankeyDiagram) {
-    // Update all link paths that use this legend
+    // Update all link paths that use this carrier
     const linkGroups = sankeyDiagram.querySelectorAll('.links .link');
     linkGroups.forEach(linkGroup => {
       const pathElement = linkGroup.querySelector('path');
-      if (pathElement && pathElement.__data__ && pathElement.__data__.legend === legendId) {
+      if (pathElement && pathElement.__data__ && (pathElement.__data__.carrier === carrierId || pathElement.__data__.legend === carrierId)) {
         // Update the data bound to the element
         pathElement.__data__.color = newColor;
         // Update the visual styling
@@ -4395,13 +4443,13 @@ function updateCarrierColor(carrierId, newColor) {
     // Also update the parent group's data if it exists
     const linkGroups2 = sankeyDiagram.querySelectorAll('.links .link');
     linkGroups2.forEach(linkGroup => {
-      if (linkGroup.__data__ && linkGroup.__data__.legend === legendId) {
+      if (linkGroup.__data__ && (linkGroup.__data__.carrier === carrierId || linkGroup.__data__.legend === carrierId)) {
         linkGroup.__data__.color = newColor;
       }
     });
   }
 
-  // console.log('Legend color updated successfully');
+  // console.log('Carrier color updated successfully in all data structures');
 }
 
 // Function to update scroll extent width
@@ -5431,6 +5479,9 @@ window.saveLinkEdit = function saveLinkEdit() {
   // console.log('Original data:', currentEditingLink.data);
   // console.log('New values:', { newSource, newTarget, newValue, newLegend, newDirection });
   
+  // Declare globalLinkIndex at function scope so it's accessible throughout
+  let globalLinkIndex = -1;
+  
   // Update the D3-bound data object
   currentEditingLink.data.source = newSource;
   currentEditingLink.data.target = newTarget;
@@ -5446,7 +5497,6 @@ window.saveLinkEdit = function saveLinkEdit() {
     // console.log('Total links in global array:', window.links.length);
     
     // First try to match by index (most reliable)
-    let globalLinkIndex = -1;
     if (currentEditingLink.data.index !== undefined) {
       // Try direct index match
       if (currentEditingLink.data.index < window.links.length) {
@@ -5541,6 +5591,35 @@ window.saveLinkEdit = function saveLinkEdit() {
     }
   }
   
+  // CRITICAL FIX: Also update window.originalLinksData for export functionality
+  // This ensures edited values are included when exporting to Excel/JSON/YAML
+  if (window.originalLinksData && Array.isArray(window.originalLinksData) && globalLinkIndex > -1) {
+    // Use the same index from the window.links update
+    if (globalLinkIndex < window.originalLinksData.length) {
+      // Update originalLinksData to match the edited values
+      if (window.originalLinksData[globalLinkIndex]['source.id'] !== undefined) {
+        window.originalLinksData[globalLinkIndex]['source.id'] = newSource;
+      }
+      if (window.originalLinksData[globalLinkIndex]['target.id'] !== undefined) {
+        window.originalLinksData[globalLinkIndex]['target.id'] = newTarget;
+      }
+      if (window.originalLinksData[globalLinkIndex].source !== undefined) {
+        window.originalLinksData[globalLinkIndex].source = newSource;
+      }
+      if (window.originalLinksData[globalLinkIndex].target !== undefined) {
+        window.originalLinksData[globalLinkIndex].target = newTarget;
+      }
+      
+      window.originalLinksData[globalLinkIndex].value = newValue;
+      window.originalLinksData[globalLinkIndex].legend = newLegend;
+      window.originalLinksData[globalLinkIndex].carrier = newLegend;
+      if (newDirection !== undefined) {
+        window.originalLinksData[globalLinkIndex].direction = newDirection;
+      }
+      // console.log('Updated originalLinksData for export:', window.originalLinksData[globalLinkIndex]);
+    }
+  }
+  
   // console.log('Saved link changes:', currentEditingLink.data);
   
   // Close popup first
@@ -5621,6 +5700,15 @@ window.deleteLink = function deleteLink() {
         const deletedSankeyLink = window.sankeyDataObject.links[sankeyLinkIndex];
         window.sankeyDataObject.links.splice(sankeyLinkIndex, 1);
         // console.log('Also removed link from sankeyDataObject:', deletedSankeyLink);
+      }
+    }
+    
+    // CRITICAL FIX: Also remove from window.originalLinksData for export functionality
+    if (window.originalLinksData && Array.isArray(window.originalLinksData)) {
+      if (globalLinkIndex < window.originalLinksData.length) {
+        const deletedOriginalLink = window.originalLinksData[globalLinkIndex];
+        window.originalLinksData.splice(globalLinkIndex, 1);
+        // console.log('Also removed link from originalLinksData:', deletedOriginalLink);
       }
     }
     
@@ -6042,6 +6130,11 @@ window.saveNewFlow = function saveNewFlow() {
   if (!window.links) window.links = [];
   window.links.push(newLink);
   // console.log('Added to window.links. Total links:', window.links.length);
+  
+  // CRITICAL FIX: Also add to window.originalLinksData for export functionality
+  if (!window.originalLinksData) window.originalLinksData = [];
+  window.originalLinksData.push({...newLink}); // Use spread to create a copy
+  // console.log('Added to window.originalLinksData. Total links:', window.originalLinksData.length);
   
   // Also add to sankeyDataObject if it exists
   if (window.sankeyDataObject) {
@@ -6725,6 +6818,11 @@ window.updateDecimalsRoundValues = function updateDecimalsRoundValues(newDecimal
       // Update global settings for export
       if (typeof window.settings !== 'undefined' && window.settings[0]) {
         window.settings[0].decimalsRoundValues = decimalsValue;
+      }
+      
+      // Update settingsGlobal used by D3 diagram
+      if (typeof settingsGlobal !== 'undefined' && settingsGlobal[0]) {
+        settingsGlobal[0].decimalsRoundValues = decimalsValue;
       }
       
       // Refresh the diagram to apply new rounding
@@ -7448,6 +7546,11 @@ function setupDragAndDrop() {
     window.settings = transformedSettings;
     window.remarks = data.remarks || [];
     
+    // Update settingsGlobal used by D3 diagram
+    if (typeof settingsGlobal !== 'undefined') {
+      settingsGlobal = transformedSettings;
+    }
+    
     // Store original data
     window.originalExcelData = {
       nodes: JSON.parse(JSON.stringify(data.nodes)),
@@ -7475,7 +7578,6 @@ function setupDragAndDrop() {
     // Clear existing SVG content
     const existingSVG = document.getElementById('energyflows_sankeySVGPARENT');
     if (existingSVG) {
-      existingSVG.innerHTML = '';
       existingSVG.remove();
     }
     
@@ -7484,6 +7586,23 @@ function setupDragAndDrop() {
     if (container) {
       container.innerHTML = '';
     }
+    
+    // Reset sankey instances to avoid conflicts with old state
+    if (typeof sankeyInstances !== 'undefined') {
+      Object.keys(sankeyInstances).forEach(key => delete sankeyInstances[key]);
+    }
+    if (typeof window.sankeyInstances !== 'undefined') {
+      Object.keys(window.sankeyInstances).forEach(key => delete window.sankeyInstances[key]);
+    }
+    if (typeof sankeyDataObject !== 'undefined') {
+      sankeyDataObject = {links: [], nodes: []};
+    }
+    if (typeof window.sankeyDataObject !== 'undefined') {
+      window.sankeyDataObject = {links: [], nodes: []};
+    }
+    
+    // Set flag to disable transitions during import
+    window.isImporting = true;
     
     // Call processData to render the diagram
     // console.log('Calling processData...');

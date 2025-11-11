@@ -90,6 +90,23 @@ function fileLoadButton () {
       d3.select('#downloadButton').remove()
       sankeyData = {links: [],nodes: [],order: []}
 
+      // Reset sankey instances to avoid conflicts with old state
+      if (typeof sankeyInstances !== 'undefined') {
+        Object.keys(sankeyInstances).forEach(key => delete sankeyInstances[key])
+      }
+      if (typeof window.sankeyInstances !== 'undefined') {
+        Object.keys(window.sankeyInstances).forEach(key => delete window.sankeyInstances[key])
+      }
+      if (typeof sankeyDataObject !== 'undefined') {
+        sankeyDataObject = {links: [], nodes: []}
+      }
+      if (typeof window.sankeyDataObject !== 'undefined') {
+        window.sankeyDataObject = {links: [], nodes: []}
+      }
+
+      // Set flag to disable transitions during import
+      window.isImporting = true
+
       const data = new Uint8Array(e.target.result) // Read the file as a binary array
       const workbook = XLSX.read(data, { type: 'array' }) // Parse the Excel file
 
@@ -183,6 +200,11 @@ function fileLoadButton () {
 
     config.settings = settings
     config.legend = legend
+
+    // Update settingsGlobal used by D3 diagram
+    if (typeof settingsGlobal !== 'undefined') {
+      settingsGlobal = settings
+    }
 
     globalscaleHeight = settings[0].scaleHeight
     globalCO2flowScale = settings[0].scaleDataValueCO2flow

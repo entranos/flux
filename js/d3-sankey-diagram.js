@@ -20770,6 +20770,12 @@ function defaultMinWidth (d) {
 	      .text(function(d){
           const formatWithDecimals = (value) => {
             const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
+            // When decimals is 0, format as integer without decimal point
+            if (decimals === 0) {
+              return new Intl.NumberFormat('de-DE', { 
+                maximumFractionDigits: 0 
+              }).format(Math.round(value));
+            }
             return new Intl.NumberFormat('de-DE', { 
               minimumFractionDigits: decimals,
               maximumFractionDigits: decimals 
@@ -20786,6 +20792,12 @@ function defaultMinWidth (d) {
               // Format the value with the correct number of decimals
               const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
               const formatWithDecimals = (value) => {
+                // When decimals is 0, format as integer without decimal point
+                if (decimals === 0) {
+                  return new Intl.NumberFormat('de-DE', { 
+                    maximumFractionDigits: 0 
+                  }).format(Math.round(value));
+                }
                 return new Intl.NumberFormat('de-DE', { 
                   minimumFractionDigits: decimals,
                   maximumFractionDigits: decimals 
@@ -20844,10 +20856,14 @@ function defaultMinWidth (d) {
       .style('display',function(d){if(d.value == 0){return 'none'} else return 'inherit'}) // ADD TIJS 2025 // do not compute if zero or unused
         .attr('width', function (d) {
           const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
-          const formattedValue = new Intl.NumberFormat('de-DE', { 
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals 
-          }).format(d.value > 0 && d.value < 0.5 ? 0 : d.value);
+          const displayValue = d.value > 0 && d.value < 0.5 ? 0 : d.value;
+          // When decimals is 0, format as integer without decimal point
+          const formattedValue = decimals === 0 
+            ? new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Math.round(displayValue))
+            : new Intl.NumberFormat('de-DE', { 
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals 
+              }).format(displayValue);
           return getTextWidth(formattedValue + (currentUnit ? ' ' + currentUnit : ''), '10px', 'Roboto',300)+10})
         .style('visibility', function (d) {
           if (d.title === ".") {
@@ -20867,6 +20883,12 @@ function defaultMinWidth (d) {
           // Format the value with the correct number of decimals
           const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
           const formatWithDecimals = (value) => {
+            // When decimals is 0, format as integer without decimal point
+            if (decimals === 0) {
+              return new Intl.NumberFormat('de-DE', { 
+                maximumFractionDigits: 0 
+              }).format(Math.round(value));
+            }
             return new Intl.NumberFormat('de-DE', { 
               minimumFractionDigits: decimals,
               maximumFractionDigits: decimals 

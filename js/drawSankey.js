@@ -1,5 +1,7 @@
 let sankeyInstances = {}
 let sankeyDataObject = {}
+// Make sankeyInstances globally accessible
+window.sankeyInstances = sankeyInstances
 // let sankeyLayout
 // let sankeyDiagram
 let activeScenario = 0
@@ -571,9 +573,8 @@ function drawSankey (sankeyDataInput, config) {
       if (d.carrier === 'co2flow') {
         return d.carrier + ' | ' + parseInt(d.value * globalCO2flowScale) + ' kton CO2'
       } else {
-        if (currentUnit === 'TWh') {
-          return d.carrier + ' | ' + parseInt(d.value / 3.6) + ' TWh'
-        } else if (currentUnit) {
+        // Display the actual value without automatic conversion
+        if (currentUnit) {
           return d.carrier + ' | ' + parseInt(d.value) + ' ' + currentUnit
         } else {
           return d.carrier + ' | ' + parseInt(d.value)
@@ -755,6 +756,11 @@ function tick (config) {
 
     updateSankey(JSON.stringify(sankeyData), config.settings[0].offsetX, config.settings[0].offsetY, config.settings[0].fontSize, config.settings[0].font, config)
     d3.selectAll('#' + config.sankeyInstanceID + ' .node-title').style('font-size', '11px')
+
+    // Clear the import flag after successful render
+    if (window.isImporting) {
+      delete window.isImporting
+    }
   })
 }
 
@@ -764,26 +770,54 @@ function updateSankey (json, offsetX, offsetY, fontSize, fontFamily, config) {
     d3.select('#error').text('')
   } catch (e) { d3.select('#error').text(e); return; }
 
+  if (!(config.sankeyInstanceID in sankeyInstances)) {
+    console.error('CRITICAL: sankeyInstance not found for ID:', config.sankeyInstanceID)
+    console.error('This should not happen - sankeyInstance should be created in processData')
+    return
+  }
+
   sankeyInstances[config.sankeyInstanceID].sankeyLayout.nodePosition(function (node) {
     return [node.x, node.y]
   })
 
-  let duration = 1000
+  // Process the data through the sankey layout
+  const processedData = sankeyInstances[config.sankeyInstanceID].sankeyLayout.scale(scaleHeight)(json)
 
-  d3.select('#' + config.sankeyInstanceID + '_sankeySVGPARENT').datum(sankeyInstances[config.sankeyInstanceID].sankeyLayout.scale(scaleHeight)(json)).transition().duration(duration).ease(d3.easeCubicInOut).call(sankeyInstances[config.sankeyInstanceID].sankeyDiagram)
-    .on('end', function () {
-      // Apply drag behavior after the transition is complete
-      // console.log('Sankey transition completed, applying drag behavior...')
-      applyDragBehavior(config)
+  // If importing, skip transition entirely to avoid interpolation with old data
+  // Otherwise use normal transition for smooth updates
+  if (window.isImporting) {
+    d3.select('#' + config.sankeyInstanceID + '_sankeySVGPARENT')
+      .datum(processedData)
+      .call(sankeyInstances[config.sankeyInstanceID].sankeyDiagram)
 
-      // Check for offscreen nodes after sankey is fully rendered
-      if (typeof checkOffscreenNodes === 'function') {
-        setTimeout(() => {
-          // console.log('Checking for offscreen nodes after sankey render...')
-          checkOffscreenNodes(config)
-        }, 100)
-      }
-    })
+    // Apply drag behavior immediately (no transition to wait for)
+    applyDragBehavior(config)
+
+    // Check for offscreen nodes after render
+    if (typeof checkOffscreenNodes === 'function') {
+      setTimeout(() => {
+        checkOffscreenNodes(config)
+      }, 100)
+    }
+  } else {
+    d3.select('#' + config.sankeyInstanceID + '_sankeySVGPARENT')
+      .datum(processedData)
+      .transition()
+      .duration(1000)
+      .ease(d3.easeCubicInOut)
+      .call(sankeyInstances[config.sankeyInstanceID].sankeyDiagram)
+      .on('end', function () {
+        // Apply drag behavior after the transition is complete
+        applyDragBehavior(config)
+
+        // Check for offscreen nodes after sankey is fully rendered
+        if (typeof checkOffscreenNodes === 'function') {
+          setTimeout(() => {
+            checkOffscreenNodes(config)
+          }, 100)
+        }
+      })
+  }
   d3.select('#' + config.sankeyInstanceID + ' .sankey').attr('transform', 'translate(' + offsetX + ',' + offsetY + ')')
   d3.selectAll('#' + config.sankeyInstanceID + ' .node-title').style('font-size', fontSize + 'px')
 
@@ -896,9 +930,9 @@ function showValueOnHover (value) {
       // Show '0' for small values in regular flow tooltips too
       const displayValue = (originalValue > 0 && originalValue < 0.5) ? 0 : originalValue
 
-      if (currentUnit === 'TWh') {
-        return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue / 3.6)) + ' TWh'
-      } else if (currentUnit) {
+      // Display the actual value without automatic conversion
+      // The value stored in the data is the value that should be displayed
+      if (currentUnit) {
         return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue)) + ' ' + currentUnit
       } else {
         return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue))
