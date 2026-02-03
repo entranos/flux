@@ -234,7 +234,8 @@ function processData (links, nodes, legend, settings, remarks, config) {
       value: links[i].value,
       type: links[i].type,
       carrier: links[i]['carrier'],
-      visibility: 1
+      visibility: 1,
+      annotate: links[i].annotate || '' // Add annotate attribute from YAML
     })
     scenarios.forEach((element) => {
       sankeyDataObject.links[i][element.id] = links[i][element.id]
@@ -570,16 +571,24 @@ function drawSankey (sankeyDataInput, config) {
   // Add hover event handlers to links
   sankeyInstances[config.sankeyInstanceID].sankeyDiagram
     .linkTitle((d) => {
+      let title = ''
       if (d.carrier === 'co2flow') {
-        return d.carrier + ' | ' + parseInt(d.value * globalCO2flowScale) + ' kton CO2'
+        title = d.carrier + ' | ' + parseInt(d.value * globalCO2flowScale) + ' kton CO2'
       } else {
         // Display the actual value without automatic conversion
         if (currentUnit) {
-          return d.carrier + ' | ' + parseInt(d.value) + ' ' + currentUnit
+          title = d.carrier + ' | ' + parseInt(d.value) + ' ' + currentUnit
         } else {
-          return d.carrier + ' | ' + parseInt(d.value)
+          title = d.carrier + ' | ' + parseInt(d.value)
         }
       }
+
+      // Add annotate information if available
+      if (d.annotate && d.annotate.trim() !== '') {
+        title += '\n\n' + d.annotate
+      }
+
+      return title
     })
     // Skip the problematic mouse events on sankeyDiagram - we'll handle them elsewhere
     // The sankeyDiagram .on() method is causing D3 v7 compatibility issues
@@ -599,6 +608,7 @@ function drawSankey (sankeyDataInput, config) {
       })
       .on('mouseout', function (d) {
         d3.select(this).style('opacity', 1)
+        hideValueOnHover()
       })
   }
 }
@@ -840,6 +850,7 @@ function updateSankey (json, offsetX, offsetY, fontSize, fontFamily, config) {
       .on('mouseout', function (d) {
         if (d.visibility !== 0) {
           d3.select(this).style('opacity', 0.9)
+          hideValueOnHover()
         }
       })
   }
@@ -919,31 +930,64 @@ function showValueOnHover (value) {
   const formatWithThousandsSeparator = (d) => {
     return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(d); // Format with '.' as thousands separator
   }
-  d3.select('#showValueOnHover').html(function (d) {
-    const originalValue = value._groups[0][0].__data__.value
 
-    if (value._groups[0][0].__data__.carrier == 'co2flow') {
+  const linkData = value._groups[0][0].__data__
+  const originalValue = linkData.value
+  const annotate = linkData.annotate || ''
+  const carrierColor = linkData.color
+  const sourceId = linkData.source.id || linkData.source
+  const targetId = linkData.target.id || linkData.target
+
+  d3.select('#showValueOnHover').html(function (d) {
+    let mainText = ''
+    if (linkData.carrier == 'co2flow') {
       // Show '0' for small values in CO2 flow tooltips too
       const displayValue = (originalValue > 0 && originalValue < 0.5) ? 0 : originalValue
-      return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue * globalCO2flowScale)) + ' kton CO2'
+      mainText = linkData.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue * globalCO2flowScale)) + ' kton CO2'
     } else {
       // Show '0' for small values in regular flow tooltips too
       const displayValue = (originalValue > 0 && originalValue < 0.5) ? 0 : originalValue
 
       // Display the actual value without automatic conversion
-      // The value stored in the data is the value that should be displayed
       if (currentUnit) {
-        return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue)) + ' ' + currentUnit
+        mainText = linkData.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue)) + ' ' + currentUnit
       } else {
-        return value._groups[0][0].__data__.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue))
+        mainText = linkData.carrier + ' | ' + formatWithThousandsSeparator(parseInt(displayValue))
       }
     }
-  } // note
 
-  )
-    .style('background-color', value._groups[0][0].__data__.color).interrupt().style('opacity', 1)
-  d3.select('#showValueOnHover').transition().duration(4000).style('opacity', 0)
-  if (value._groups[0][0].__data__.color == '#F8D377' || value._groups[0][0].__data__.color == '#62D3A4') {d3.select('#showValueOnHover').style('color', 'black')} else {d3.select('#showValueOnHover').style('color', 'white')}
+    // Build tooltip HTML with colored dot
+    let tooltipHTML = '<div class="tooltip-header">'
+    tooltipHTML += '<span class="carrier-dot" style="background-color: ' + carrierColor + ';"></span>'
+    tooltipHTML += '<span>' + mainText + '</span>'
+    tooltipHTML += '</div>'
+
+    // Add source and target information
+    tooltipHTML += '<div class="tooltip-annotation">'
+    tooltipHTML += '<strong>From:</strong> ' + sourceId + '<br>'
+    tooltipHTML += '<strong>To:</strong> ' + targetId
+    tooltipHTML += '</div>'
+
+    // Add annotate information if available
+    if (annotate && annotate.trim() !== '') {
+      tooltipHTML += '<div class="tooltip-annotation">'
+      tooltipHTML += '<strong>Annotations:</strong><br>'
+      tooltipHTML += annotate.replace(/\n/g, '<br>')
+      tooltipHTML += '</div>'
+    }
+
+    return tooltipHTML
+  })
+    .interrupt()
+    .style('opacity', 1)
+}
+
+function hideValueOnHover () {
+  d3.select('#showValueOnHover')
+    .interrupt()
+    .transition()
+    .duration(200)
+    .style('opacity', 0)
 }
 
 // Functions moved from drawSelectionButtons.js
