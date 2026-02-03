@@ -5898,6 +5898,8 @@ window.saveNodeEdit = function saveNodeEdit() {
       sankeyNode.title = newName;
       sankeyNode.x = newX;
       sankeyNode.y = newY;
+      sankeyNode.labelposition = newLabelPosition;
+      sankeyNode.direction = newDirection;
       // Update position properties
       if (sankeyNode.x0 !== undefined) sankeyNode.x0 = newX;
       if (sankeyNode.y0 !== undefined) sankeyNode.y0 = newY;
