@@ -5453,7 +5453,6 @@ window.editLink = function editLink(linkData, linkElement) {
     console.warn('Both linkData.carrier and linkData.legend are empty or undefined');
   }
   
-  document.getElementById('linkDirectionSelect').value = linkData.direction || 'r'; // Default to 'r' if not specified
   
   // Hide any existing popups first
   const allPopups = document.querySelectorAll('.edit-popup');
@@ -5473,7 +5472,6 @@ window.saveLinkEdit = function saveLinkEdit() {
   const newTarget = document.getElementById('linkTargetSelect').value;
   const newValue = parseFloat(document.getElementById('linkValueInput').value);
   const newLegend = document.getElementById('linkLegendSelect').value;
-  const newDirection = document.getElementById('linkDirectionSelect').value;
   
   // console.log('=== SAVING LINK EDIT ===');
   // console.log('Original data:', currentEditingLink.data);
@@ -5488,7 +5486,6 @@ window.saveLinkEdit = function saveLinkEdit() {
   currentEditingLink.data.value = newValue;
   currentEditingLink.data.legend = newLegend; // Keep for backwards compatibility
   currentEditingLink.data.carrier = newLegend; // New property name
-  currentEditingLink.data.direction = newDirection;
   
   // Also update the corresponding entry in window.links array
   if (window.links && Array.isArray(window.links)) {
@@ -5558,7 +5555,6 @@ window.saveLinkEdit = function saveLinkEdit() {
       window.links[globalLinkIndex].value = newValue;
       window.links[globalLinkIndex].legend = newLegend; // Keep for backwards compatibility
       window.links[globalLinkIndex].carrier = newLegend; // New property name
-      window.links[globalLinkIndex].direction = newDirection;
       
       // console.log('Original link was:', originalLink);
       // console.log('Updated global link:', window.links[globalLinkIndex]);
@@ -5613,9 +5609,6 @@ window.saveLinkEdit = function saveLinkEdit() {
       window.originalLinksData[globalLinkIndex].value = newValue;
       window.originalLinksData[globalLinkIndex].legend = newLegend;
       window.originalLinksData[globalLinkIndex].carrier = newLegend;
-      if (newDirection !== undefined) {
-        window.originalLinksData[globalLinkIndex].direction = newDirection;
-      }
       // console.log('Updated originalLinksData for export:', window.originalLinksData[globalLinkIndex]);
     }
   }
