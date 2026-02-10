@@ -265,6 +265,7 @@ function processData (links, nodes, legend, settings, remarks, config) {
         if (d.title && d.title.startsWith('_')) {
           return null // Do not draw a title if it starts with '_' (but value will still be shown)
         }
+        // For '_' nodes, return the title so the element is created (content will be replaced with value)
         return d.title
       })
       .linkColor((d) => d.color)
@@ -344,6 +345,8 @@ function processData (links, nodes, legend, settings, remarks, config) {
               // For nodes starting with '_', hide the value label (we'll show it in title position)
               label.style.display = 'none'
             } else {
+              // For nodes starting with '_', show the value label (title is hidden)
+              // For all other nodes, respect the setting
               label.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none'
               processedCount++
             }
@@ -365,6 +368,8 @@ function processData (links, nodes, legend, settings, remarks, config) {
               // For nodes starting with '_', hide the value backdrop
               label.style.display = 'none'
             } else {
+              // For nodes starting with '_', value backdrops are hidden (value shown in title position)
+              // For all other nodes, respect the setting
               label.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none'
             }
           } else {
@@ -399,6 +404,10 @@ function processData (links, nodes, legend, settings, remarks, config) {
             }
           }
         })
+
+        // Note: For nodes starting with '_', the value is shown in the title position
+        // This is handled directly in d3-sankey-diagram.js, not here
+
       // console.log(`Applied showValueLabels ${showValueLabelsSetting} to ${processedCount} labels`)
       }
     }
