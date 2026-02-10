@@ -262,6 +262,9 @@ function processData (links, nodes, legend, settings, remarks, config) {
         if (d.title && d.title.startsWith('.')) {
           return null // Do not draw a title if it starts with '.'
         }
+        if (d.title && d.title.startsWith('_')) {
+          return null // Do not draw a title if it starts with '_' (but value will still be shown)
+        }
         return d.title
       })
       .linkColor((d) => d.color)
@@ -325,6 +328,8 @@ function processData (links, nodes, legend, settings, remarks, config) {
       if (sankeyDiagram) {
         const valueLabels = sankeyDiagram.querySelectorAll('.nodes .node .node-value')
         const valueLabelsBackdrop = sankeyDiagram.querySelectorAll('.nodes .node .node-backdrop-value')
+        const titleLabels = sankeyDiagram.querySelectorAll('.nodes .node .node-title')
+        const titleBackdrops = sankeyDiagram.querySelectorAll('.nodes .node .node-backdrop-title')
         let processedCount = 0
 
         valueLabels.forEach(label => {
@@ -334,6 +339,9 @@ function processData (links, nodes, legend, settings, remarks, config) {
             const nodeName = nodeElement.__data__.title || ''
             // Never show labels for nodes starting with '.'
             if (nodeName.startsWith('.')) {
+              label.style.display = 'none'
+            } else if (nodeName.startsWith('_')) {
+              // For nodes starting with '_', hide the value label (we'll show it in title position)
               label.style.display = 'none'
             } else {
               label.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none'
@@ -353,11 +361,42 @@ function processData (links, nodes, legend, settings, remarks, config) {
             const nodeName = nodeElement.__data__.title || ''
             if (nodeName.startsWith('.')) {
               label.style.display = 'none'
+            } else if (nodeName.startsWith('_')) {
+              // For nodes starting with '_', hide the value backdrop
+              label.style.display = 'none'
             } else {
               label.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none'
             }
           } else {
             label.style.display = showValueLabelsSetting === 'Yes' ? 'block' : 'none'
+          }
+        })
+
+        // For nodes starting with '_', show the value in the title position
+        titleLabels.forEach(label => {
+          const nodeElement = label.closest('.node')
+          if (nodeElement && nodeElement.__data__) {
+            const nodeName = nodeElement.__data__.title || ''
+            if (nodeName.startsWith('_')) {
+              // Get the value from the corresponding value label
+              const valueLabel = nodeElement.querySelector('.node-value')
+              if (valueLabel) {
+                // Copy the value text to the title label
+                label.textContent = valueLabel.textContent
+                label.style.display = 'block'
+              }
+            }
+          }
+        })
+
+        // Show title backdrop for nodes starting with '_'
+        titleBackdrops.forEach(backdrop => {
+          const nodeElement = backdrop.closest('.node')
+          if (nodeElement && nodeElement.__data__) {
+            const nodeName = nodeElement.__data__.title || ''
+            if (nodeName.startsWith('_')) {
+              backdrop.style.display = 'block'
+            }
           }
         })
       // console.log(`Applied showValueLabels ${showValueLabelsSetting} to ${processedCount} labels`)
