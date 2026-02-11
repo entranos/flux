@@ -105,102 +105,75 @@
   </script>
   <div id="main-container">
     <div class="content-fullwidth" style="padding:0px">
-      <div class="header-labels sticky-header">
-        <div class="header-content">
-          <div class="header-text">
-            <div class="concept-label label-base">
-              FLUX
-            </div>
-            <div class="middle-label label-base" style="font-size:13px;">
-              &nbsp; create bespoke sankey diagrams
-            </div>
-            <!-- <div class="version-label label-base">
-              attribution
-            </div> -->
-          </div>
-          <div class="header-buttons">
-            <button id="importExcelButton" class="edit-btn excel" onclick="importExcelFile()">
-              <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14,2 14,8 20,8"></polyline>
-                <polyline points="16,13 8,13"></polyline>
-                <polyline points="16,17 8,17"></polyline>
-                <polyline points="10,9 9,9 8,9"></polyline>
-                <path d="M12 11v6M9 14l3-3 3 3"></path>
-              </svg> -->
-              Import XLSX
-            </button>
 
-            <button id="exportNodesButton" class="edit-btn excel" onclick="exportToExcel()">
-              <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14,2 14,8 20,8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10,9 9,9 8,9"></polyline>
-              </svg> -->
-              Export XLSX
-            </button>
+      <!-- White header section with logo and description (matching logo_source.html layout) -->
+      <div class="content-constrained" style="background-color: white; position: relative;">
+        <!-- Version label (top-left, like in viewer) -->
+        <div id="versionLabel"
+          style="position:absolute;top:0;left:50px;background-color:#999;color:#fff;font-size:11px;font-weight:700;padding:6px 16px;border-radius:0;">
+          v11.02.2026</div>
+        <!-- Manual icon button (top-right, like settings icon in viewer) -->
+        <button id="manualButton" onclick="showManual()"
+          style="position:absolute;top:20px;right:20px;background:none;border:none;cursor:pointer;padding:8px;opacity:0.5;transition:opacity 0.2s;"
+          onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+        <br><br><br>
+        <h3 style="display:flex;align-items:center;gap:20px;">
+          <div style="display:inline-grid;grid-template-columns:repeat(3,6px);gap:7px;flex-shrink:0;">
+            <div style="width:6px;height:6px;background:#F8D377;"></div>
+            <div style="width:6px;height:6px;background:#7555F6;"></div>
+            <div style="width:6px;height:6px;background:#DD5471;"></div>
+            <div style="width:6px;height:6px;background:#3F88AE;"></div>
+            <div style="width:6px;height:6px;background:#E99172;"></div>
+            <div style="width:6px;height:6px;background:#777;"></div>
+            <div style="width:6px;height:6px;background:#f8b8c1;"></div>
+            <div style="width:6px;height:6px;background:#37765C;"></div>
+            <div style="width:6px;height:6px;background:#62D3A4;"></div>
+          </div><span style="font-weight:300;font-size:44px;color:#888">FLUX</span><span
+            style="font-weight:100;color:#bbb;font-size:44px;"> | </span><span
+            style="font-weight:300;font-size:25px;color:#777">sankey editor</span>
+        </h3>
+        <br><br>
+        <p style="line-height:30px; width: 70%;">
+          FLUX lets you create Sankey diagrams with precision, flexibility and consistency in
+          unit-to-pixel scaling across sets of diagrams. Edit and import diagram
+          configuration data using spreadsheets, fine-tune layout and node positioning using FLUX, have it
+          render results to PNG or SVG images and export all diagram configuration data back to XLSX or JSON or YAML for
+          versioning, collaboration and future edits.</p>
+      </div>
 
-            <button id="importDataButton" class="edit-btn data" onclick="importData()">
-              <span id="importButtonLabel">Import JSON</span>
-            </button>
-
-            <button id="exportDataButton" class="edit-btn data" onclick="exportData()">
-              <span id="exportButtonLabel">Export JSON</span>
-            </button>
-
-            <button id="exportPngButton" class="edit-btn image" onclick="exportSvgToPng()">
-              <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7,10 12,15 17,10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg> -->
-              Export PNG
-            </button>
-
-            <button id="exportSvgButton" class="edit-btn image" onclick="exportToSvg()">
-              <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14,2 14,8 20,8"></polyline>
-                <path d="M8 13h2M8 17h2M16 13v4M16 11a2 2 0 0 0-2-2h-1"></path>
-              </svg> -->
-              Export SVG
-            </button>
-
-            <button id="manualButton" class="edit-btn manual" onclick="showManual()">
-              <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> -->
-              MANUAL
-            </button>
-
-          </div>
+      <!-- Sticky button bar (matching logo_source.html menu bar) -->
+      <div class="content-fullwidth sticky" style="background-color:#DCE6EF;padding-bottom:0px;padding-top:0px;">
+        <div class="header-buttons" style="display:flex;align-items:center;padding:8px 50px;flex-wrap:wrap;">
+          <button id="importExcelButton" class="edit-btn" onclick="importExcelFile()">
+            import xlsx
+          </button>
+          <button id="exportNodesButton" class="edit-btn" onclick="exportToExcel()">
+            export xlsx
+          </button>
+          <button id="importDataButton" class="edit-btn" onclick="importData()">
+            <span id="importButtonLabel">import json</span>
+          </button>
+          <button id="exportDataButton" class="edit-btn" onclick="exportData()">
+            <span id="exportButtonLabel">export json</span>
+          </button>
+          <button id="exportPngButton" class="edit-btn" onclick="exportSvgToPng()">
+            export png
+          </button>
+          <button id="exportSvgButton" class="edit-btn" onclick="exportToSvg()">
+            export svg
+          </button>
         </div>
       </div>
 
-
-
       <div class=" full-width-container">
         <div class="content-constrained" id="control_panel" style="background-color: #EEF5FA;">
-
-          <!-- Tool Description -->
-          <div class="tool-description">
-            <p>FLUX lets you create Sankey diagrams with precision, flexibility and consistency in
-              unit-to-pixel scaling across sets of diagrams. Edit and import diagram
-              configuration data using spreadsheets, fine-tune layout and node positioning using FLUX, have it
-              render
-              results to PNG or SVG images and export all diagram configuration data back to XLSX or JSON or YAML for
-              versioning,
-              collaboration and future edits.</p>
-          </div>
 
           <div class="controls-grid">
             <!-- Scaling Group -->
@@ -1009,12 +982,10 @@
             <div class="balance-placeholder">Balance information will appear here after diagram is loaded...</div>
           </div>
         </div>
-        <p style="text-align: center; font-size:12px;">Developed by Tijs
-          Langeveld</a> using <a href="https://d3js.org/">d3.js</a>, <a
+        <p style="text-align: center; font-size:12px;">Developed using <a href="https://d3js.org/">d3.js</a>, <a
             href="https://github.com/ricklupton/d3-sankey-diagram">d3-sankey</a>, <a
             href="https://milligram.io/">milligram</a>
-          and <a href="https://github.com/SheetJS/sheetJS">sheetJS</a>. <a
-            href="https://www.linkedin.com/in/tijslangeveld/">Get in touch.</p>
+          and <a href="https://github.com/SheetJS/sheetJS">sheetJS</a>.
       </div>
       <!-- All sections after Sankey removed for simplified version -->
 
