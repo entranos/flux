@@ -147,8 +147,8 @@ function initTool () {
   // console.log(sankeyConfigs)
 
   if (dataSource == 'url') {
-    // Load YAML file instead of Excel
-    readYAMLFile(YAMLurl, (rawSankeyData) => {
+    // Load XLSX file by default
+    readExcelFile(XLSXurl, (rawSankeyData) => {
 
       d3.select('#loadFileDialog').style('visibility', 'hidden').style('pointer-events', 'none')
       d3.selectAll('.buttonTitles').style('visibility', 'visible')
@@ -448,14 +448,15 @@ function generateSankeyLibrary (workbook) {
   workbook.SheetNames.forEach(sheetName => {
     const worksheet = workbook.Sheets[sheetName]
     if (worksheet) {
-      // Check if this is a direct sankeyfy sheet name
-      if (['links', 'nodes', 'remarks', 'carriers', 'settings'].includes(sheetName)) {
+      // Check if this is a direct sankeyfy sheet name (case-insensitive)
+      const sheetNameLower = sheetName.toLowerCase()
+      if (['links', 'nodes', 'remarks', 'carriers', 'settings'].includes(sheetNameLower)) {
         // Ensure the top-level object exists
-        if (!sankeyDataLibrary[sheetName]) {
-          sankeyDataLibrary[sheetName] = {}
+        if (!sankeyDataLibrary[sheetNameLower]) {
+          sankeyDataLibrary[sheetNameLower] = {}
         }
         // Store the data with empty string key (since sankeyDataID is empty)
-        sankeyDataLibrary[sheetName][''] = XLSX.utils.sheet_to_json(worksheet)
+        sankeyDataLibrary[sheetNameLower][''] = XLSX.utils.sheet_to_json(worksheet)
       }
       // Also handle the old snky_ prefix format for backwards compatibility
       else if (sheetName.startsWith('snky_')) {

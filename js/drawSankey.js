@@ -232,7 +232,7 @@ function processData (links, nodes, legend, settings, remarks, config) {
       target: links[i]['target.id'],
       color: getColor(links[i]['carrier'], legend),
       value: links[i].value,
-      type: links[i].type,
+      type: links[i].type || ('auto_' + Math.random().toString(36).substring(2, 10)),
       carrier: links[i]['carrier'],
       visibility: 1,
       annotate: links[i].annotate || '' // Add annotate attribute from YAML
