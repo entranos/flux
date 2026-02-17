@@ -20766,19 +20766,29 @@ function defaultMinWidth (d) {
 
 	    value
       .attr('data-labelposition',function (d){return d.labelposition})
-        .style('display',function(d){if(d.value == 0){return 'none'} else return 'inherit'}) // ADD TIJS 2025 // do not compute if zero or unused
+        .style('display',function(d){
+          // Hide value labels for nodes starting with '.' or '_'
+          if (d.title && (d.title.startsWith('.') || d.title.startsWith('_'))) {
+            return 'none'
+          }
+          // Hide if value is zero
+          if(d.value == 0){
+            return 'none'
+          }
+          return 'inherit'
+        }) // ADD TIJS 2025 // do not compute if zero or unused
 	      .text(function(d){
           const formatWithDecimals = (value) => {
             const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
             // When decimals is 0, format as integer without decimal point
             if (decimals === 0) {
-              return new Intl.NumberFormat('de-DE', { 
-                maximumFractionDigits: 0 
+              return new Intl.NumberFormat('de-DE', {
+                maximumFractionDigits: 0
               }).format(Math.round(value));
             }
-            return new Intl.NumberFormat('de-DE', { 
+            return new Intl.NumberFormat('de-DE', {
               minimumFractionDigits: decimals,
-              maximumFractionDigits: decimals 
+              maximumFractionDigits: decimals
             }).format(value);
           };
           // Show '0' for values between 0 and 0.5, otherwise format normally
@@ -20786,7 +20796,13 @@ function defaultMinWidth (d) {
           return formatWithDecimals(displayValue) + (currentUnit ? ' ' + currentUnit : '')
         })
         .attr('fill',settingsGlobal[0].labelTextColor)
-	      .style('display', function (d) { return (d.x1 - d.x0) > 2 ? 'inline' : 'inline' })
+	      .style('display', function (d) {
+          // Hide value labels for nodes starting with '.' or '_'
+          if (d.title && (d.title.startsWith('.') || d.title.startsWith('_'))) {
+            return 'none'
+          }
+          return (d.x1 - d.x0) > 2 ? 'inline' : 'inline'
+        })
         .attr('x', function(d){
           if (d['labelposition'] == 'left'){
               // Format the value with the correct number of decimals
@@ -20817,12 +20833,29 @@ function defaultMinWidth (d) {
 	    text
        .attr('data-labelposition',function (d){return d.labelposition})
         .style('display',function(d){if(d.value == 0){return 'none'} else return 'inherit'}) // ADD TIJS 2025 // do not compute if zero or unused
-        
+
         .attr('text-anchor',function(d){ if (d['labelposition'] == 'left'){return 'end'} else return 'start'})
 	      // .attr('text-anchor', function (d) { return nodeLayout.get(this).right ? 'end' : 'start' })
         // .attr('text-anchor',function(d){ console.log(d['labelposition.'+globalActiveEnergyflowsFilter]);if (d['labelposition.'+globalActiveEnergyflowsFilter] == 'rechts'){return 'end'} else return 'start'})
-        
-	      .text(function(d){ 
+
+	      .text(function(d){
+          // For nodes starting with '_', show the formatted value instead of the title
+          if (d.title && d.title.startsWith('_')) {
+            const formatWithDecimals = (value) => {
+              const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
+              if (decimals === 0) {
+                return new Intl.NumberFormat('de-DE', {
+                  maximumFractionDigits: 0
+                }).format(Math.round(value));
+              }
+              return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+              }).format(value);
+            };
+            const displayValue = (d.value > 0 && d.value < 0.5) ? 0 : d.value;
+            return formatWithDecimals(displayValue) + (currentUnit ? ' ' + currentUnit : '')
+          }
           return d.title
         })          
       .attr('x',function(d){
@@ -20835,12 +20868,29 @@ function defaultMinWidth (d) {
         .attr('data-labelposition',function (d){return d.labelposition})
         .style('display',function(d){if(d.value == 0){return 'none'} else return 'inherit'}) // ADD TIJS 2025 // do not compute if zero or unused
         .attr('width', function (d) {
-          // console.log(d.title)
-          // console.log(getTextWidth(d.title, '11px', 'Roboto'))
+          // For nodes starting with '_', calculate width based on value text
+          if (d.title && d.title.startsWith('_')) {
+            const formatWithDecimals = (value) => {
+              const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
+              if (decimals === 0) {
+                return new Intl.NumberFormat('de-DE', {
+                  maximumFractionDigits: 0
+                }).format(Math.round(value));
+              }
+              return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+              }).format(value);
+            };
+            const displayValue = (d.value > 0 && d.value < 0.5) ? 0 : d.value;
+            const valueText = formatWithDecimals(displayValue) + (currentUnit ? ' ' + currentUnit : '');
+            return getTextWidth(valueText, '10px', 'Roboto', 300) + 10;
+          }
           return getTextWidth(d.title, '10px', 'Roboto',300) +  10; // EDIT TIJS add TODO: make font-family dynamic
         })
         .style('visibility', function (d) {
-          if (d.title === ".") {
+          // Hide backdrop for nodes starting with '.' (but not '_')
+          if (d.title && d.title.startsWith('.')) {
             return 'hidden';
           } else if (d.value > 0) {
             return 'visible';
@@ -20848,12 +20898,40 @@ function defaultMinWidth (d) {
             return 'hidden';
           }
         }).attr('x',function(d){
+          // For nodes starting with '_', calculate position based on value text
+          if (d.title && d.title.startsWith('_')) {
+            const formatWithDecimals = (value) => {
+              const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
+              if (decimals === 0) {
+                return new Intl.NumberFormat('de-DE', {
+                  maximumFractionDigits: 0
+                }).format(Math.round(value));
+              }
+              return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+              }).format(value);
+            };
+            const displayValue = (d.value > 0 && d.value < 0.5) ? 0 : d.value;
+            const valueText = formatWithDecimals(displayValue) + (currentUnit ? ' ' + currentUnit : '');
+            if (d['labelposition'] == 'right'){return 15} else { return - getTextWidth(valueText, '10px', 'Roboto',300)-23}
+          }
           if (d['labelposition'] == 'right'){return 15} else { return - getTextWidth(d.title, '10px', 'Roboto',300)-23}
         }).attr('fill',settingsGlobal[0].labelFillColor)
       
       backdropValue //EDIT TIJS add
       .attr('data-labelposition',function (d){return d.labelposition})
-      .style('display',function(d){if(d.value == 0){return 'none'} else return 'inherit'}) // ADD TIJS 2025 // do not compute if zero or unused
+      .style('display',function(d){
+        // Hide backdrop for nodes starting with '.' or '_'
+        if (d.title && (d.title.startsWith('.') || d.title.startsWith('_'))) {
+          return 'none'
+        }
+        // Hide if value is zero
+        if(d.value == 0){
+          return 'none'
+        }
+        return 'inherit'
+      }) // ADD TIJS 2025 // do not compute if zero or unused
         .attr('width', function (d) {
           const decimals = settingsGlobal[0].decimalsRoundValues !== undefined ? settingsGlobal[0].decimalsRoundValues : 1;
           const displayValue = d.value > 0 && d.value < 0.5 ? 0 : d.value;
@@ -20866,7 +20944,8 @@ function defaultMinWidth (d) {
               }).format(displayValue);
           return getTextWidth(formattedValue + (currentUnit ? ' ' + currentUnit : ''), '10px', 'Roboto',300)+10})
         .style('visibility', function (d) {
-          if (d.title === ".") {
+          // Hide backdrop for nodes starting with '.' or '_'
+          if (d.title && (d.title.startsWith('.') || d.title.startsWith('_'))) {
             return 'hidden';
           } else if (d.value > 0) {
             return 'visible';
@@ -21030,9 +21109,14 @@ function defaultMinWidth (d) {
         text
 	      .attr('transform', textTransform)
 	      .style('display', function (d) {
+          // Hide titles for nodes starting with '.' (but not '_')
+          if (d.title && d.title.startsWith('.')) {
+            return 'none'
+          }
 	        return (d.y0 === d.y1 || !nodeVisible(d)) ? 'none' : 'inline'
 	      }).style('visibility', function (d) {
-          if (d.title === ".") {
+          // Hide titles for nodes starting with '.' (but not '_')
+          if (d.title && d.title.startsWith('.')) {
             return 'hidden';
           } else if (d.value > 0) {
             return 'visible';
@@ -21044,12 +21128,17 @@ function defaultMinWidth (d) {
 
 	    value
       .attr('transform', textTransform)
-      
-        
+
+
         .style('display', function (d) {
+          // Hide value labels for nodes starting with '.' or '_'
+          if (d.title && (d.title.startsWith('.') || d.title.startsWith('_'))) {
+            return 'none'
+          }
 	        return (d.y0 === d.y1 || !nodeVisible(d)) ? 'none' : 'inline'
 	      }).style('visibility', function (d) {
-          if (d.title === ".") {
+          // Hide value labels for nodes starting with '.' or '_'
+          if (d.title && (d.title.startsWith('.') || d.title.startsWith('_'))) {
             return 'hidden';
           } else if (d.value > 0) {
             return 'visible';
@@ -21064,18 +21153,26 @@ function defaultMinWidth (d) {
 	        // var theta = dx > dy ? 0 : -90
 	        return 'translate(' + (dx / 2) + ',' + (dy / 2) + ')'
 	      }).style('display', function (d) {
+          // Hide backdrop for nodes starting with '.' (but not '_')
+          if (d.title && d.title.startsWith('.')) {
+            return 'none'
+          }
 	        return (d.y0 === d.y1 || !nodeVisible(d)) ? 'none' : 'inline'
 	      })
 
         backdropValue
- 
+
         .attr('transform', function (d) { // EDIT TIJS ADD
-	        var dx = d.x1 - d.x0  
+	        var dx = d.x1 - d.x0
 	        var dy = d.y1 - d.y0
-        
+
 	        // var theta = dx > dy ? 0 : -90
 	        return 'translate(' + (dx / 2) + ',' + (dy / 2) + ')'
 	      }).style('display', function (d) {
+          // Hide backdrop for nodes starting with '.' or '_'
+          if (d.title && (d.title.startsWith('.') || d.title.startsWith('_'))) {
+            return 'none'
+          }
 	        return (d.y0 === d.y1 || !nodeVisible(d)) ? 'none' : 'inline'
 	      })
 
