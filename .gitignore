@@ -1,0 +1,9 @@
+# Negeer output en grote data
+/trash/
+/data/
+
+# Negeer alle .command files
+*.command
+.DS_Store
+~$*
+fluxdata*.yaml
