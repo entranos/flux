@@ -647,18 +647,18 @@ function drawSankey (sankeyDataInput, config) {
     .style('pointer-events', 'all')
     .style('cursor', 'pointer')
 
-  // Only add mouse events if not disabled (for import compatibility)
-  if (!window.disableMouseEvents) {
-    linkSelection
-      .on('mouseover', function (event, d) {
-        showValueOnHover(d3.select(this))
-        d3.select(this).style('opacity', 0.8)
-      })
-      .on('mouseout', function (d) {
-        d3.select(this).style('opacity', 1)
-        hideValueOnHover()
-      })
-  }
+  // Always bind mouse events, but check disableMouseEvents flag at event time
+  linkSelection
+    .on('mouseover', function (event, d) {
+      if (window.disableMouseEvents) return
+      showValueOnHover(d3.select(this))
+      d3.select(this).style('opacity', 0.8)
+    })
+    .on('mouseout', function (d) {
+      if (window.disableMouseEvents) return
+      d3.select(this).style('opacity', 1)
+      hideValueOnHover()
+    })
 }
 
 function reSankey (filter, scenario, config) {
@@ -886,22 +886,22 @@ function updateSankey (json, offsetX, offsetY, fontSize, fontFamily, config) {
     .style('cursor', 'pointer')
     .style('opacity', function (d) { return d.visibility === 0 ? 0 : 0.9 })
 
-  // Only add mouse events if not disabled (for import compatibility)
-  if (!window.disableMouseEvents) {
-    updateLinkSelection
-      .on('mouseover', function (event, d) {
-        if (d.visibility !== 0) {
-          showValueOnHover(d3.select(this))
-          d3.select(this).style('opacity', 0.8)
-        }
-      })
-      .on('mouseout', function (d) {
-        if (d.visibility !== 0) {
-          d3.select(this).style('opacity', 0.9)
-          hideValueOnHover()
-        }
-      })
-  }
+  // Always bind mouse events, but check disableMouseEvents flag at event time
+  updateLinkSelection
+    .on('mouseover', function (event, d) {
+      if (window.disableMouseEvents) return
+      if (d.visibility !== 0) {
+        showValueOnHover(d3.select(this))
+        d3.select(this).style('opacity', 0.8)
+      }
+    })
+    .on('mouseout', function (d) {
+      if (window.disableMouseEvents) return
+      if (d.visibility !== 0) {
+        d3.select(this).style('opacity', 0.9)
+        hideValueOnHover()
+      }
+    })
 
   // Click events are always enabled
   updateLinkSelection
