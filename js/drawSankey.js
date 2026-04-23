@@ -228,8 +228,8 @@ function processData (links, nodes, legend, settings, remarks, config) {
     sankeyDataObject.links.push({
       // remark: remarks[i],
       index: i,
-      source: links[i]['source.id'],
-      target: links[i]['target.id'],
+      source: links[i]['source'] ?? links[i]['source.id'],
+      target: links[i]['target'] ?? links[i]['target.id'],
       color: getColor(links[i]['carrier'], legend),
       value: links[i].value,
       type: links[i].type || ('auto_' + Math.random().toString(36).substring(2, 10)),
